@@ -1,0 +1,356 @@
+{% comment %}
+  Section: Drop Announcement Banner
+  Usage: Add to /sections/drop-announcement.liquid
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@700&display=swap" rel="stylesheet">
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --section-max-width: {{ section.settings.max_width }}px;
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --section-padding-x: {{ section.settings.padding_x }}px;
+    --inner-padding-y: {{ section.settings.inner_padding_y }}px;
+    --heading-size: {{ section.settings.heading_size }}px;
+    --heading-line-height: {{ section.settings.heading_line_height }};
+    --heading-letter-spacing: {{ section.settings.heading_letter_spacing }}em;
+    --btn-height: {{ section.settings.btn_height }}px;
+    --btn-padding-x: {{ section.settings.btn_padding_x }}px;
+    --btn-font-size: {{ section.settings.btn_font_size }}px;
+    --btn-letter-spacing: {{ section.settings.btn_letter_spacing }}em;
+    --gap: {{ section.settings.gap }}px;
+    --bg: {{ section.settings.bg_color }};
+    --text-color: {{ section.settings.text_color }};
+    --btn-bg: {{ section.settings.btn_bg_color }};
+    --btn-text-color: {{ section.settings.btn_text_color }};
+    --border-color: {{ section.settings.border_color }};
+  }
+
+  #shopify-section-{{ section.id }} .drop-wrap {
+    background: var(--bg);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #shopify-section-{{ section.id }} .drop-inner {
+    max-width: var(--section-max-width);
+    margin: 0 auto;
+    padding: var(--section-padding-top) var(--section-padding-x) var(--section-padding-bottom);
+  }
+
+  #shopify-section-{{ section.id }} .drop-row {
+    padding: var(--inner-padding-y) 0;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--gap);
+  }
+
+  #shopify-section-{{ section.id }} .drop-heading {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: var(--heading-size);
+    line-height: var(--heading-line-height);
+    letter-spacing: var(--heading-letter-spacing);
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0;
+  }
+
+  #shopify-section-{{ section.id }} .drop-btn {
+    flex-shrink: 0;
+    height: var(--btn-height);
+    padding: 0 var(--btn-padding-x);
+    display: inline-flex;
+    align-items: center;
+    background: var(--btn-bg);
+    color: var(--btn-text-color);
+    font-family: 'Manrope', sans-serif;
+    font-size: var(--btn-font-size);
+    font-weight: 700;
+    letter-spacing: var(--btn-letter-spacing);
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.18s ease;
+  }
+
+  #shopify-section-{{ section.id }} .drop-btn:hover {
+    opacity: 0.78;
+  }
+
+  @media screen and (max-width: 1024px) {
+    #shopify-section-{{ section.id }} {
+      --section-padding-x: {{ section.settings.padding_x | times: 0.75 | round }}px;
+      --heading-size: {{ section.settings.heading_size | times: 0.75 | round }}px;
+      --inner-padding-y: {{ section.settings.inner_padding_y | times: 0.7 | round }}px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      --section-padding-x: 20px;
+      --section-padding-top: {{ section.settings.padding_top | times: 0.6 | round }}px;
+      --section-padding-bottom: {{ section.settings.padding_bottom | times: 0.55 | round }}px;
+      --inner-padding-y: {{ section.settings.inner_padding_y | times: 0.55 | round }}px;
+      --heading-size: {{ section.settings.heading_size | times: 0.58 | round }}px;
+      --btn-height: {{ section.settings.btn_height | times: 0.85 | round }}px;
+      --btn-padding-x: 20px;
+      --btn-font-size: 10px;
+      --gap: 20px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    #shopify-section-{{ section.id }} {
+      --section-padding-x: 16px;
+      --heading-size: {{ section.settings.heading_size | times: 0.44 | round }}px;
+      --btn-height: {{ section.settings.btn_height | times: 0.65 | round }}px;
+      --btn-padding-x: 16px;
+      --gap: 16px;
+    }
+  }
+</style>
+
+<div class="drop-wrap">
+  <div class="drop-inner">
+    <div class="drop-row">
+      <p class="drop-heading">{{ section.settings.heading_text }}</p>
+      {% if section.settings.btn_label != blank %}
+        <a
+          href="{{ section.settings.btn_url }}"
+          class="drop-btn"
+          {% if section.settings.btn_new_tab %}target="_blank" rel="noopener"{% endif %}
+        >
+          {{ section.settings.btn_label }}
+          {% if section.settings.show_arrow %} →{% endif %}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Drop Announcement",
+  "tag": "section",
+  "class": "section-drop-announcement",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading_text",
+      "label": "Heading Text",
+      "default": "Drop 01 is live."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Shop the drop"
+    },
+    {
+      "type": "url",
+      "id": "btn_url",
+      "label": "Button URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "btn_new_tab",
+      "label": "Open in new tab",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrow",
+      "label": "Show arrow (→) after button",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F5F2EC"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading Color",
+      "default": "#0B0B0B"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Top Color",
+      "default": "#0B0B0B"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_color",
+      "label": "Button Background",
+      "default": "#0B0B0B"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button Text Color",
+      "default": "#F5F2EC"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading Font Size (px)",
+      "min": 20,
+      "max": 96,
+      "step": 2,
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "heading_line_height",
+      "label": "Heading Line Height",
+      "options": [
+        { "value": "0.9", "label": "0.9 — Very Tight" },
+        { "value": "0.95", "label": "0.95 — Tight" },
+        { "value": "1", "label": "1.0 — Normal" },
+        { "value": "1.1", "label": "1.1 — Relaxed" },
+        { "value": "1.2", "label": "1.2 — Loose" }
+      ],
+      "default": "0.95"
+    },
+    {
+      "type": "select",
+      "id": "heading_letter_spacing",
+      "label": "Heading Letter Spacing",
+      "options": [
+        { "value": "-0.04", "label": "-0.04em — Very Tight" },
+        { "value": "-0.025", "label": "-0.025em — Tight" },
+        { "value": "0", "label": "0em — Normal" },
+        { "value": "0.02", "label": "0.02em — Wide" },
+        { "value": "0.05", "label": "0.05em — Very Wide" }
+      ],
+      "default": "-0.025"
+    },
+    {
+      "type": "range",
+      "id": "btn_font_size",
+      "label": "Button Font Size (px)",
+      "min": 9,
+      "max": 18,
+      "step": 1,
+      "default": 11
+    },
+    {
+      "type": "select",
+      "id": "btn_letter_spacing",
+      "label": "Button Letter Spacing",
+      "options": [
+        { "value": "0.1", "label": "0.1em" },
+        { "value": "0.15", "label": "0.15em" },
+        { "value": "0.22", "label": "0.22em — Default" },
+        { "value": "0.3", "label": "0.3em" },
+        { "value": "0.4", "label": "0.4em" }
+      ],
+      "default": "0.22"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Section Max Width (px)",
+      "min": 800,
+      "max": 1800,
+      "step": 50,
+      "default": 1500
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Section Padding Top (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Section Padding Bottom (px)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "label": "Section Padding Sides (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "inner_padding_y",
+      "label": "Inner Row Padding Y (px)",
+      "min": 16,
+      "max": 120,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "btn_height",
+      "label": "Button Height (px)",
+      "min": 32,
+      "max": 80,
+      "step": 2,
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "btn_padding_x",
+      "label": "Button Side Padding (px)",
+      "min": 12,
+      "max": 80,
+      "step": 2,
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap Between Heading & Button (px)",
+      "min": 12,
+      "max": 120,
+      "step": 4,
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Drop Announcement",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

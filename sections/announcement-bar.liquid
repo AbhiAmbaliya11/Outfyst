@@ -1,0 +1,358 @@
+{{ 'component-slideshow.css' | asset_url | stylesheet_tag }}
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign social_icons = true
+  if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
+    assign social_icons = false
+  endif
+  if section.settings.enable_country_selector or section.settings.enable_language_selector
+    assign language_country_selector = true
+  endif
+  if section.blocks.size > 0
+    assign announcement_bar = true
+  endif
+-%}
+
+<style>
+  /* ============================================================
+     OUTFYST ANNOUNCEMENT BAR
+     ============================================================ */
+  .outfyst-announcement-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: rgba(11, 11, 11, 0.92);
+    color: rgba(245, 242, 236, 0.7);
+    font-family: 'Manrope', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    z-index: 60;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* LEFT — scrolling announcement messages */
+  .outfyst-announcement-bar__left {
+    color: rgba(245, 242, 236, 0.7);
+    font-family: 'Manrope', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Single announcement */
+  .outfyst-announcement-bar__left .outfyst-ann-single {
+    white-space: nowrap;
+  }
+
+  /* Multi-announcement slider */
+  .outfyst-ann-slider {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    height: 30px;
+  }
+
+
+/* REPLACE WITH */
+.outfyst-ann-slider__track {
+  display: flex;
+  width: 100%;
+}
+/* ADD after .outfyst-ann-slide rule */
+.outfyst-ann-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 400ms ease;
+  pointer-events: none;
+}
+
+.outfyst-ann-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+  .outfyst-ann-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 100%;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    height: 30px;
+    overflow: hidden;
+  }
+
+  .outfyst-ann-slide a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .outfyst-ann-slide a:hover {
+    color: rgba(245, 242, 236, 1);
+  }
+
+  /* RIGHT — locale & support links */
+  .outfyst-announcement-bar__right {
+    color: rgba(245, 242, 236, 0.7);
+    font-family: 'Manrope', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+
+  .outfyst-announcement-bar__right a,
+  .outfyst-ann-locale {
+    color: rgba(245, 242, 236, 0.7);
+    text-decoration: none;
+    transition: color 180ms;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .outfyst-announcement-bar__right a:hover,
+  .outfyst-ann-locale:hover {
+    color: rgba(245, 242, 236, 1);
+  }
+
+
+  /* Hide Dawn's default announcement bar section wrapper padding */
+  .announcement-bar-section {
+    padding: 0 !important;
+  }
+
+  @media screen and (max-width: 990px) {
+  .outfyst-announcement-bar {
+    display: none;
+  }
+}
+</style>
+
+<!-- ============================================================
+     OUTFYST ANNOUNCEMENT BAR MARKUP
+     ============================================================ -->
+<div class="outfyst-announcement-bar" role="region" aria-label="Announcement bar">
+
+  <!-- LEFT: Dynamic announcement blocks -->
+  <div class="outfyst-announcement-bar__left">
+    {%- if section.blocks.size == 1 -%}
+      {%- assign block = section.blocks.first -%}
+      {%- if block.settings.text != blank -%}
+        <span class="outfyst-ann-single" {{ block.shopify_attributes }}>
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}">{{ block.settings.text | escape }}</a>
+          {%- else -%}
+            {{ block.settings.text | escape }}
+          {%- endif -%}
+        </span>
+      {%- endif -%}
+
+    {%- elsif section.blocks.size > 1 -%}
+      <div
+        class="outfyst-ann-slider"
+        id="outfyst-ann-slider-{{ section.id }}"
+        data-autoplay="{{ section.settings.auto_rotate }}"
+        data-speed="{{ section.settings.change_slides_speed | times: 1000 }}"
+        aria-live="polite"
+      >
+        <div class="outfyst-ann-slider__track" id="outfyst-ann-track-{{ section.id }}">
+          {%- for block in section.blocks -%}
+            {%- if block.settings.text != blank -%}
+              <div
+                class="outfyst-ann-slide"
+                id="outfyst-ann-slide-{{ section.id }}-{{ forloop.index }}"
+                {{ block.shopify_attributes }}
+                role="group"
+                aria-label="{{ forloop.index }} of {{ forloop.length }}"
+              >
+                {%- if block.settings.link != blank -%}
+                  <a href="{{ block.settings.link }}">{{ block.settings.text | escape }}</a>
+                {%- else -%}
+                  {{ block.settings.text | escape }}
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <!-- RIGHT: Locale pill + Support link -->
+  <div class="outfyst-announcement-bar__right">
+
+    {%- if section.settings.locale_text != blank -%}
+      <span class="outfyst-ann-locale">{{ section.settings.locale_text }}</span>
+    
+    {%- endif -%}
+
+    {%- if section.settings.support_text != blank -%}
+      {%- if section.settings.support_link != blank -%}
+        <a href="{{ section.settings.support_link }}">{{ section.settings.support_text }}</a>
+      {%- else -%}
+        <span>{{ section.settings.support_text }}</span>
+      {%- endif -%}
+    {%- endif -%}
+
+  </div>
+
+</div>
+
+<!-- Slider JS for multi-block auto-rotate -->
+{%- if section.blocks.size > 1 -%}
+<script>
+  (function () {
+    var sliderEl  = document.getElementById('outfyst-ann-slider-{{ section.id }}');
+    var trackEl   = document.getElementById('outfyst-ann-track-{{ section.id }}');
+    if (!sliderEl || !trackEl) return;
+
+    var slides    = trackEl.querySelectorAll('.outfyst-ann-slide');
+    var total     = slides.length;
+    var current   = 0;
+    var autoplay  = sliderEl.getAttribute('data-autoplay') === 'true';
+    var speed     = parseInt(sliderEl.getAttribute('data-speed'), 10) || 5000;
+    var timer     = null;
+    function goTo(index) {
+      slides.forEach(function(s) { s.classList.remove('is-active'); });
+      current = (index + total) % total;
+      slides[current].classList.add('is-active');
+    }
+
+    function next() { goTo(current + 1); }
+
+    goTo(0);
+
+    if (autoplay) {
+      timer = setInterval(next, speed);
+      sliderEl.addEventListener('mouseenter', function () { clearInterval(timer); });
+      sliderEl.addEventListener('mouseleave', function () { timer = setInterval(next, speed); });
+    }
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Announcement Bar",
+  "max_blocks": 12,
+  "class": "announcement-bar-section",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Announcement Slideshow"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_rotate",
+      "label": "Auto-rotate announcements",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "change_slides_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "Slide duration",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Right Side — Locale & Support"
+    },
+    {
+      "type": "text",
+      "id": "locale_text",
+      "label": "Locale label",
+      "default": "EN · INR",
+      "info": "Shown on the right, e.g. EN · INR"
+    },
+    {
+      "type": "text",
+      "id": "support_text",
+      "label": "Support link label",
+      "default": "SUPPORT"
+    },
+    {
+      "type": "url",
+      "id": "support_link",
+      "label": "Support link URL"
+    },
+    {
+      "type": "header",
+      "content": "Legacy options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "default": false,
+      "label": "Show social icons"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "default": false,
+      "label": "Enable country selector"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "default": false,
+      "label": "Enable language selector"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "default": "FREE SHIPPING ABOVE RS. 5,000 · NO RESTOCKS",
+          "label": "Announcement text"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement Bar",
+      "blocks": [
+        {
+          "type": "announcement"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1821 @@
+{% comment %}
+  Section: Worlds — Two Drops. One Ethos.
+  Block types:
+    • drop          → Block 1 & 2: Full left-visual + right-info panel (launched drops)
+    • coming_soon   → Block 3 & 4: Two-column coming-soon grid (countdown + image panel)
+  All text, colors, URLs, dates fully editable in schema.
+  Email notify uses Shopify Customer API → appears in Admin › Customers.
+{% endcomment %}
+
+<section
+  class="worlds-drops-section"
+  id="worlds-drops-{{ section.id }}"
+  style="
+    --section-bg: {{ section.settings.section_bg_color }};
+    --heading-color: {{ section.settings.heading_color }};
+    --label-color: {{ section.settings.label_color }};
+    --panel-right-bg: {{ section.settings.panel_right_bg_color }};
+    --meta-color: {{ section.settings.meta_text_color }};
+    --desc-color: {{ section.settings.description_color }};
+    --btn-primary-bg: {{ section.settings.btn_primary_bg }};
+    --btn-primary-text: {{ section.settings.btn_primary_text_color }};
+    --btn-primary-hover-bg: {{ section.settings.btn_primary_hover_bg }};
+    --btn-primary-hover-text: {{ section.settings.btn_primary_hover_text_color }};
+    --btn-secondary-bg: {{ section.settings.btn_secondary_bg }};
+    --btn-secondary-text: {{ section.settings.btn_secondary_text_color }};
+    --btn-secondary-border: {{ section.settings.btn_secondary_border_color }};
+    --btn-secondary-hover-bg: {{ section.settings.btn_secondary_hover_bg }};
+    --btn-secondary-hover-text: {{ section.settings.btn_secondary_hover_text_color }};
+    --live-badge-bg: {{ section.settings.live_badge_bg }};
+    --live-badge-text: {{ section.settings.live_badge_text_color }};
+    --drop-label-color: {{ section.settings.drop_label_color }};
+    --drop-headline-color: {{ section.settings.drop_headline_color }};
+    --all-drops-color: {{ section.settings.all_drops_color }};
+    --all-drops-hover-color: {{ section.settings.all_drops_hover_color }};
+  "
+>
+  <div class="worlds-drops__wrapper">
+
+    {%- comment -%} ── TOP BAR ── {%- endcomment -%}
+    <div class="worlds-drops__top-bar">
+      <div class="worlds-drops__top-bar-left">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="worlds-drops__eyebrow">{{ section.settings.eyebrow }}</p>
+        {%- endif -%}
+        {%- if section.settings.section_heading != blank -%}
+          <h2 class="worlds-drops__heading">{{ section.settings.section_heading }}</h2>
+        {%- endif -%}
+      </div>
+      <div class="worlds-drops__top-bar-right">
+        {%- if section.settings.all_drops_label != blank and section.settings.all_drops_url != blank -%}
+          <a class="worlds-drops__all-drops-link" href="{{ section.settings.all_drops_url }}">
+            {{ section.settings.all_drops_label }} &rarr;
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%} ── BLOCK ROWS ── {%- endcomment -%}
+    {%- for block in section.blocks -%}
+
+      {%- comment -%} ════════════════════════════════════════
+          BLOCK TYPE: drop  (Blocks 1 & 2 — launched drops)
+          Layout: big left visual + right info panel
+      ════════════════════════════════════════ {%- endcomment -%}
+      {%- if block.type == 'drop' -%}
+
+        <div class="worlds-drops__item worlds-drops__item--launched" {{ block.shopify_attributes }}>
+
+          {%- comment -%} LEFT PANEL — Visual {%- endcomment -%}
+          <div class="worlds-drops__left-panel">
+            <div class="worlds-drops__visual-bg"
+              style="
+                {%- if block.settings.bg_image != blank -%}
+                  background-image: url('{{ block.settings.bg_image | img_url: 'master' }}');
+                  background-size: cover;
+                  background-position: {{ block.settings.bg_image_position }};
+                {%- else -%}
+                  background: {{ block.settings.bg_color }};
+                {%- endif -%}
+              "
+            >
+              {%- if block.settings.show_texture_overlay -%}
+                <div class="worlds-drops__texture-overlay"></div>
+              {%- endif -%}
+
+              {%- if block.settings.show_live_badge -%}
+                <div class="worlds-drops__live-badge">
+                  <span class="worlds-drops__live-dot"></span>
+                  {{ block.settings.live_badge_label | default: 'LIVE NOW' }}
+                </div>
+              {%- endif -%}
+
+              <div class="worlds-drops__visual-footer">
+                {%- if block.settings.drop_label != blank -%}
+                  <p class="worlds-drops__drop-label">{{ block.settings.drop_label }}</p>
+                {%- endif -%}
+                {%- if block.settings.drop_headline != blank -%}
+                  <h3 class="worlds-drops__drop-headline">{{ block.settings.drop_headline }}</h3>
+                {%- endif -%}
+              </div>
+            </div>
+          </div>
+
+          {%- comment -%} RIGHT PANEL — Info + CTA {%- endcomment -%}
+          <div class="worlds-drops__right-panel">
+            <div class="worlds-drops__right-inner">
+
+              <div class="custom-flex">
+              {%- if block.settings.drop_meta != blank -%}
+                <p class="worlds-drops__meta">{{ block.settings.drop_meta }}</p>
+              {%- endif -%}
+
+              {%- if block.settings.drop_description != blank -%}
+                <div class="worlds-drops__description">
+                  {{ block.settings.drop_description }}
+                </div>
+              {%- endif -%}
+              </div>
+
+              <div class="worlds-drops__cta-group">
+                {%- if block.settings.btn_primary_label != blank and block.settings.btn_primary_url != blank -%}
+                  <a
+                    class="worlds-drops__btn worlds-drops__btn--primary"
+                    href="{{ block.settings.btn_primary_url }}"
+                    style="
+                      background: {{ block.settings.btn_primary_bg | default: 'var(--btn-primary-bg)' }};
+                      color: {{ block.settings.btn_primary_text | default: 'var(--btn-primary-text)' }};
+                      --block-btn-primary-hover-bg: {{ block.settings.btn_primary_hover_bg | default: 'var(--btn-primary-hover-bg)' }};
+                      --block-btn-primary-hover-text: {{ block.settings.btn_primary_hover_text | default: 'var(--btn-primary-hover-text-color)' }};
+                    "
+                  >
+                    {{ block.settings.btn_primary_label }} &rarr;
+                  </a>
+                {%- endif -%}
+
+                {%- if block.settings.btn_secondary_label != blank and block.settings.btn_secondary_url != blank -%}
+                  <a
+                    class="worlds-drops__btn worlds-drops__btn--secondary"
+                    href="{{ block.settings.btn_secondary_url }}"
+                    style="
+                      background: {{ block.settings.btn_secondary_bg | default: 'var(--btn-secondary-bg)' }};
+                      color: {{ block.settings.btn_secondary_text | default: 'var(--btn-secondary-text)' }};
+                      border-color: {{ block.settings.btn_secondary_border | default: 'var(--btn-secondary-border)' }};
+                      --block-btn-secondary-hover-bg: {{ block.settings.btn_secondary_hover_bg | default: 'var(--btn-secondary-hover-bg)' }};
+                      --block-btn-secondary-hover-text: {{ block.settings.btn_secondary_hover_text | default: 'var(--btn-secondary-hover-text-color)' }};
+                    "
+                  >
+                    {{ block.settings.btn_secondary_label }}
+                  </a>
+                {%- endif -%}
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      {%- endif -%}
+
+      {%- comment -%} ════════════════════════════════════════
+          BLOCK TYPE: coming_soon  (Blocks 3 & 4 — upcoming drops)
+          Layout: two equal columns side by side
+            Left col  → meta, description, countdown, email notify, teaser link
+            Right col → image/color background + coming soon badge + drop identity
+      ════════════════════════════════════════ {%- endcomment -%}
+      {%- if block.type == 'coming_soon' -%}
+
+        {%- comment -%} Generate a unique ID per block for JS countdown + form {%- endcomment -%}
+        {%- assign cs_id = 'cs-' | append: block.id -%}
+
+        <div
+          class="worlds-drops__coming-soon-row"
+          {{ block.shopify_attributes }}
+          style="
+            --cs-left-bg: {{ block.settings.left_panel_bg }};
+            --cs-left-text: {{ block.settings.left_panel_text_color }};
+            --cs-meta-color: {{ block.settings.cs_meta_color }};
+            --cs-desc-color: {{ block.settings.cs_desc_color }};
+            --cs-countdown-color: {{ block.settings.countdown_color }};
+            --cs-countdown-label-color: {{ block.settings.countdown_label_color }};
+            --cs-notify-btn-bg: {{ block.settings.notify_btn_bg }};
+            --cs-notify-btn-text: {{ block.settings.notify_btn_text_color }};
+            --cs-notify-input-bg: {{ block.settings.notify_input_bg }};
+            --cs-notify-input-text: {{ block.settings.notify_input_text_color }};
+            --cs-notify-input-border: {{ block.settings.notify_input_border_color }};
+            --cs-teaser-color: {{ block.settings.teaser_link_color }};
+            --cs-badge-bg: {{ block.settings.coming_soon_badge_bg }};
+            --cs-badge-text: {{ block.settings.coming_soon_badge_text }};
+            --cs-drop-label-color: {{ block.settings.cs_drop_label_color }};
+            --cs-drop-headline-color: {{ block.settings.cs_drop_headline_color }};
+            --cs-launch-date-color: {{ block.settings.launch_date_color }};
+          "
+        >
+
+          {%- comment -%} LEFT COL — countdown + notify {%- endcomment -%}
+          <div class="worlds-drops__cs-left">
+            <div class="worlds-drops__cs-left-bg"
+              style="
+                {%- if block.settings.left_bg_image != blank -%}
+                  background-image: url('{{ block.settings.left_bg_image | img_url: 'master' }}');
+                  background-size: cover;
+                  background-position: center;
+                {%- else -%}
+                  background: var(--cs-left-bg);
+                {%- endif -%}
+              "
+            >
+              {%- if block.settings.show_left_texture -%}
+                <div class="worlds-drops__texture-overlay"></div>
+              {%- endif -%}
+
+              <div class="worlds-drops__cs-left-inner">
+
+                <div class="block_custom-flex">
+                    {%- comment -%} Meta + description {%- endcomment -%}
+                    {%- if block.settings.cs_meta != blank -%}
+                    <p class="worlds-drops__cs-meta">{{ block.settings.cs_meta }}</p>
+                    {%- endif -%}
+                    {%- if block.settings.cs_description != blank -%}
+                    <p class="worlds-drops__cs-desc">{{ block.settings.cs_description }}</p>
+                    {%- endif -%}
+
+                    {%- comment -%} Countdown Timer {%- endcomment -%}
+                    {%- if block.settings.launch_datetime != blank -%}
+                    <div class="worlds-drops__countdown" id="{{ cs_id }}-countdown" data-launch="{{ block.settings.launch_datetime }}">
+                        <div class="worlds-drops__countdown-unit">
+                        <span class="worlds-drops__countdown-num" id="{{ cs_id }}-days">00</span>
+                        <span class="worlds-drops__countdown-lbl">{{ block.settings.countdown_label_days | default: 'DAYS' }}</span>
+                        </div>
+                        <div class="worlds-drops__countdown-unit">
+                        <span class="worlds-drops__countdown-num" id="{{ cs_id }}-hours">00</span>
+                        <span class="worlds-drops__countdown-lbl">{{ block.settings.countdown_label_hours | default: 'HOURS' }}</span>
+                        </div>
+                        <div class="worlds-drops__countdown-unit">
+                        <span class="worlds-drops__countdown-num" id="{{ cs_id }}-mins">00</span>
+                        <span class="worlds-drops__countdown-lbl">{{ block.settings.countdown_label_mins | default: 'MIN' }}</span>
+                        </div>
+                        <div class="worlds-drops__countdown-unit">
+                        <span class="worlds-drops__countdown-num" id="{{ cs_id }}-secs">00</span>
+                        <span class="worlds-drops__countdown-lbl">{{ block.settings.countdown_label_secs | default: 'SEC' }}</span>
+                        </div>
+                    </div>
+                    {%- endif -%}
+                </div>
+
+                {%- comment -%} Email Notify Form — submits to Shopify Customer API {%- endcomment -%}
+                <div class="worlds-drops__notify-wrap" id="{{ cs_id }}-notify-wrap">
+                  <div class="worlds-drops__notify-form-row" id="{{ cs_id }}-form-row">
+                    <input
+                      class="worlds-drops__notify-input"
+                      id="{{ cs_id }}-email"
+                      type="email"
+                      placeholder="{{ block.settings.notify_placeholder | default: 'your@email.com' }}"
+                      autocomplete="email"
+                    >
+                    <button
+                      class="worlds-drops__notify-btn"
+                      type="button"
+                      onclick="worldsDropsNotify('{{ cs_id }}', '{{ block.settings.cs_meta | escape }}', '{{ block.settings.cs_description | escape }}')"
+                    >
+                      {{ block.settings.notify_btn_label | default: 'NOTIFY ME' }}
+                    </button>
+                  </div>
+                  <p class="worlds-drops__notify-success" id="{{ cs_id }}-success" style="display:none;">
+                    {{ block.settings.notify_success_msg | default: "You're on the list. Watch this space." }}
+                  </p>
+                  <p class="worlds-drops__notify-error" id="{{ cs_id }}-error" style="display:none;">
+                    {{ block.settings.notify_error_msg | default: 'Something went wrong. Please try again.' }}
+                  </p>
+                
+
+                {%- comment -%} Teaser link {%- endcomment -%}
+                {%- if block.settings.teaser_label != blank and block.settings.teaser_url != blank -%}
+                  <a class="worlds-drops__teaser-link" href="{{ block.settings.teaser_url }}">
+                    {{ block.settings.teaser_label }} &rarr;
+                  </a>
+                {%- endif -%}
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          {%- comment -%} RIGHT COL — visual panel {%- endcomment -%}
+          <div class="worlds-drops__cs-right">
+            <div class="worlds-drops__cs-right-bg"
+              style="
+                {%- if block.settings.right_bg_image != blank -%}
+                  background-image: url('{{ block.settings.right_bg_image | img_url: 'master' }}');
+                  background-size: cover;
+                  background-position: {{ block.settings.right_bg_image_position }};
+                {%- else -%}
+                  background: {{ block.settings.right_bg_color }};
+                {%- endif -%}
+              "
+            >
+              {%- if block.settings.show_right_texture -%}
+                <div class="worlds-drops__texture-overlay"></div>
+              {%- endif -%}
+
+              {%- comment -%} Coming soon badge — top right {%- endcomment -%}
+              <div class="worlds-drops__cs-badge-wrap">
+                <span class="worlds-drops__cs-badge">
+                  {{ block.settings.coming_soon_badge_label | default: 'COMING SOON' }}
+                </span>
+              </div>
+
+              {%- comment -%} Drop identity — bottom right {%- endcomment -%}
+              <div class="worlds-drops__cs-visual-footer">
+                {%- if block.settings.cs_drop_label != blank -%}
+                  <p class="worlds-drops__cs-drop-label">{{ block.settings.cs_drop_label }}</p>
+                {%- endif -%}
+                {%- if block.settings.cs_drop_headline != blank -%}
+                  <h3 class="worlds-drops__cs-drop-headline">{{ block.settings.cs_drop_headline }}</h3>
+                {%- endif -%}
+                {%- if block.settings.launch_date_display != blank -%}
+                  <p class="worlds-drops__cs-launch-date">{{ block.settings.launch_date_display }}</p>
+                {%- endif -%}
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      {%- endif -%}
+
+    {%- endfor -%}
+
+  </div>
+</section>
+
+{%- comment -%} ── STYLES ── {%- endcomment -%}
+<style>
+  #worlds-drops-{{ section.id }} {
+    background-color: var(--section-bg);
+    padding: {{ section.settings.section_padding_top }}px 0 {{ section.settings.section_padding_bottom }}px;
+    font-family: {{ section.settings.font_family }}, sans-serif;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__wrapper {
+    max-width: {{ section.settings.section_max_width }}px;
+    margin: 0 auto;
+    padding: 0 {{ section.settings.section_padding_x }}px;
+  }
+
+  @media(max-width: 768px){
+    #worlds-drops-{{ section.id }} .worlds-drops__wrapper {
+      padding: 0 1.5rem;
+    }
+  }
+
+  /* ── TOP BAR ── */
+  #worlds-drops-{{ section.id }} .worlds-drops__top-bar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--label-color);
+    margin: 0 0 6px;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__heading {
+    font-size: 56px;
+    text-transform: uppercase;
+    letter-spacing: -0.025em;
+    line-height: 0.95;
+    color: var(--heading-color);
+    margin: 0;
+  }
+
+  /* Apply to your specific section ID */
+#worlds-drops-{{ section.id }} .worlds-drops__all-drops-link {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--all-drops-color);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease, letter-spacing 0.3s ease, padding-right 0.3s ease;
+  
+  /* Ensure the link can handle the movement */
+  display: inline-flex;
+  align-items: center;
+}
+
+/* The Hover State */
+#worlds-drops-{{ section.id }} .worlds-drops__all-drops-link:hover {
+  /* This pushes the arrow (and the space before it) to the right */
+  letter-spacing: 0.25em; 
+  padding-right: 5px;
+  
+  /* Optional: if you want the color to change based on your variable */
+  opacity: 0.8; 
+}
+
+  #worlds-drops-{{ section.id }} .worlds-drops__all-drops-link:hover {
+    color: var(--all-drops-hover-color);
+  }
+
+  /* ── DROP ITEM (launched) ── */
+  #worlds-drops-{{ section.id }} .worlds-drops__item {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    min-height: {{ section.settings.panel_min_height }}px;
+    margin-bottom: {{ section.settings.item_gap }}px;
+    gap: 24px;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__item:last-child,
+  #worlds-drops-{{ section.id }} .worlds-drops__coming-soon-row:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── LEFT PANEL (launched) ── */
+  #worlds-drops-{{ section.id }} .worlds-drops__left-panel {
+    position: relative;
+    overflow: hidden;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__visual-bg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: {{ section.settings.panel_min_height }}px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 28px 28px;
+    box-sizing: border-box;
+  }
+
+  /* Diagonal stripe texture */
+  #worlds-drops-{{ section.id }} .worlds-drops__texture-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      -55deg,
+      transparent,
+      transparent 8px,
+      rgba(255,255,255,0.03) 8px,
+      rgba(255,255,255,0.03) 9px
+    );
+    pointer-events: none;
+  }
+
+  /* ── LIVE BADGE ── */
+  #worlds-drops-{{ section.id }} .worlds-drops__live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--live-badge-bg);
+    color: var(--live-badge-text);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 2px;
+    position: relative;
+    z-index: 1;
+    width: fit-content;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--live-badge-text);
+    display: inline-block;
+    animation: worlds-drops-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes worlds-drops-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* ── VISUAL FOOTER (launched) ── */
+  #worlds-drops-{{ section.id }} .worlds-drops__visual-footer {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__drop-label {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--drop-label-color);
+    margin: 0 0 6px;
+    font-weight: 600;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__drop-headline {
+    font-size: clamp(36px, 6vw, 80px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+    color: var(--drop-headline-color);
+    margin: 0;
+  }
+
+  /* ── RIGHT PANEL (launched) ── */
+  #worlds-drops-{{ section.id }} .worlds-drops__right-panel {
+    background: var(--panel-right-bg);
+    display: flex;
+    align-items: flex-end;
+    padding: 40px 36px;
+    box-sizing: border-box;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__right-inner {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: stretch;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__meta {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--meta-color);
+    margin: 0 0 16px;
+    font-weight: 600;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--desc-color);
+    margin-bottom: 32px;
+  }
+
+  /* ── BUTTONS (launched) ── */
+  #worlds-drops-{{ section.id }} .worlds-drops__cta-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__btn {
+    display: block;
+    width: 100%;
+    padding: 16px 20px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.18s ease;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__btn:hover {
+    transform: translateY(-1px);
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__btn--primary {
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__btn--primary:hover {
+    background: var(--btn-primary-hover-bg) !important;
+    color: var(--btn-primary-hover-text) !important;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__btn--secondary {
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
+    border-color: var(--btn-secondary-border);
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__btn--secondary:hover {
+    background: var(--btn-secondary-hover-bg) !important;
+    color: var(--btn-secondary-hover-text) !important;
+  }
+
+  /* ═══════════════════════════════════════
+     COMING SOON ROW (Blocks 3 & 4)
+  ═══════════════════════════════════════ */
+  #worlds-drops-{{ section.id }} .worlds-drops__coming-soon-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    min-height: {{ section.settings.panel_min_height }}px;
+    margin-bottom: {{ section.settings.item_gap }}px;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  /* LEFT COL */
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-left {
+    position: relative;
+    overflow: hidden;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-left-bg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: {{ section.settings.panel_min_height }}px;
+    background: var(--cs-left-bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 40px 36px;
+    box-sizing: border-box;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-left-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0;
+    justify-content: space-between;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-meta {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--cs-meta-color);
+    margin: 0 0 14px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-desc {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--cs-desc-color);
+    margin: 0 0 14px;
+  }
+
+  /* Countdown */
+  #worlds-drops-{{ section.id }} .worlds-drops__countdown {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__countdown-num {
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--cs-countdown-color);
+    font-variant-numeric: tabular-nums;
+    min-width: 1.6ch;
+    display: inline-block;
+    font-family: "Archivo Black", sans-serif;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__countdown-lbl {
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cs-countdown-label-color);
+    font-weight: 600;
+  }
+
+  /* Notify form */
+  #worlds-drops-{{ section.id }} .worlds-drops__notify-wrap {
+    margin-bottom: 16px;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__notify-form-row {
+    display: flex;
+    gap: 0;
+    width: 100%;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__notify-input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    font-size: 12px;
+    background: var(--cs-notify-input-bg);
+    color: var(--cs-notify-input-text);
+    border: 1px solid var(--cs-notify-input-border);
+    border-right: none;
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__notify-input::placeholder {
+    color: var(--cs-notify-input-text);
+    opacity: 0.45;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__notify-btn {
+    padding: 12px 16px;
+    background: var(--cs-notify-btn-bg);
+    color: var(--cs-notify-btn-text);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+    transition: opacity 0.2s ease;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__notify-btn:hover {
+    opacity: 0.85;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__notify-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__notify-success {
+    font-size: 12px;
+    color: #4caf50;
+    margin: 8px 0 0;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__notify-error {
+    font-size: 12px;
+    color: #e53935;
+    margin: 8px 0 0;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  /* Teaser link */
+  #worlds-drops-{{ section.id }} .worlds-drops__teaser-link {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--cs-teaser-color);
+    padding: 14px 0;
+    border: 1px solid var(--cs-teaser-color);
+    text-align: center;
+    transition: background 0.2s ease, color 0.2s ease;
+    margin-top: 10px;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__teaser-link:hover {
+    background: var(--cs-teaser-color);
+    color: var(--cs-left-bg);
+  }
+
+  /* RIGHT COL */
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-right {
+    position: relative;
+    overflow: hidden;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-right-bg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: {{ section.settings.panel_min_height }}px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 24px 24px;
+    box-sizing: border-box;
+  }
+
+  /* Coming soon badge — top right corner */
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-badge-wrap {
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+    z-index: 1;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-badge {
+    display: inline-block;
+    background: var(--cs-badge-bg);
+    color: var(--cs-badge-text);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 7px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Drop identity — bottom right */
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-visual-footer {
+    position: relative;
+    z-index: 1;
+    text-align: right;
+    margin-top: auto;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-drop-label {
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--cs-drop-label-color);
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-drop-headline {
+    font-size: clamp(36px, 5.5vw, 80px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 0.88;
+    color: var(--cs-drop-headline-color);
+    margin: 0 0 10px;
+  }
+
+  #worlds-drops-{{ section.id }} .worlds-drops__cs-launch-date {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--cs-launch-date-color);
+    margin: 0;
+    font-weight: 500;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media screen and (max-width: 900px) {
+    #worlds-drops-{{ section.id }} .worlds-drops__item,
+    #worlds-drops-{{ section.id }} .worlds-drops__coming-soon-row {
+      grid-template-columns: 1fr;
+    }
+
+    #worlds-drops-{{ section.id }} .worlds-drops__right-panel {
+      align-items: flex-start;
+    }
+
+    #worlds-drops-{{ section.id }} .worlds-drops__cs-visual-footer {
+      text-align: left;
+    }
+
+    #worlds-drops-{{ section.id }} .worlds-drops__cs-badge-wrap {
+      justify-content: flex-start;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    #worlds-drops-{{ section.id }} .worlds-drops__heading {
+      font-size: 28px;
+    }
+
+    #worlds-drops-{{ section.id }} .worlds-drops__drop-headline,
+    #worlds-drops-{{ section.id }} .worlds-drops__cs-drop-headline {
+      font-size: 36px;
+    }
+
+    #worlds-drops-{{ section.id }} .worlds-drops__top-bar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    #worlds-drops-{{ section.id }} .worlds-drops__countdown {
+      gap: 14px;
+    }
+
+    #worlds-drops-{{ section.id }} .worlds-drops__countdown-num {
+      font-size: 28px;
+    }
+  }
+  .worlds-drops__notify-input:focus-visible{
+    box-shadow: none;
+  }
+</style>
+
+{%- comment -%} ── JAVASCRIPT: Countdown + Email Notify ── {%- endcomment -%}
+<script>
+(function() {
+  /* ── Countdown Timers ── */
+  document.querySelectorAll('#worlds-drops-{{ section.id }} .worlds-drops__countdown').forEach(function(el) {
+    var launch = new Date(el.dataset.launch).getTime();
+    var id     = el.id.replace('-countdown', '');
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+      var now  = Date.now();
+      var diff = launch - now;
+
+      if (diff <= 0) {
+        document.getElementById(id + '-days').textContent  = '00';
+        document.getElementById(id + '-hours').textContent = '00';
+        document.getElementById(id + '-mins').textContent  = '00';
+        document.getElementById(id + '-secs').textContent  = '00';
+        return;
+      }
+
+      var days  = Math.floor(diff / 86400000);
+      var hours = Math.floor((diff % 86400000) / 3600000);
+      var mins  = Math.floor((diff % 3600000)  / 60000);
+      var secs  = Math.floor((diff % 60000)    / 1000);
+
+      document.getElementById(id + '-days').textContent  = pad(days);
+      document.getElementById(id + '-hours').textContent = pad(hours);
+      document.getElementById(id + '-mins').textContent  = pad(mins);
+      document.getElementById(id + '-secs').textContent  = pad(secs);
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  });
+
+  /* ── Email Notify → Shopify Customer API ── */
+  window.worldsDropsNotify = function(csId, dropMeta, dropDesc) {
+    var emailInput = document.getElementById(csId + '-email');
+    var btn        = document.querySelector('#' + csId + '-form-row .worlds-drops__notify-btn');
+    var successEl  = document.getElementById(csId + '-success');
+    var errorEl    = document.getElementById(csId + '-error');
+    var email      = (emailInput ? emailInput.value : '').trim();
+
+    successEl.style.display = 'none';
+    errorEl.style.display   = 'none';
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errorEl.textContent   = 'Please enter a valid email address.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    if (btn) {
+      btn.disabled     = true;
+      btn.textContent  = '...';
+    }
+
+    /* Build note tag so admin can identify which drop this is for */
+    var note = 'Notify Me Request — ' + (dropMeta || 'Coming Soon Drop');
+    if (dropDesc) note += ' | ' + dropDesc;
+
+    fetch('/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        form_type: 'customer',
+        utf8:      '✓',
+        'customer[email]':        email,
+        'customer[tags]':         'drop-notify',
+        'customer[note]':         note,
+        'customer[accepts_marketing]': 'true'
+      }).toString()
+    })
+    .then(function(res) {
+      if (res.ok || res.redirected) {
+        successEl.style.display = 'block';
+        if (emailInput) emailInput.value = '';
+        var formRow = document.getElementById(csId + '-form-row');
+        if (formRow) formRow.style.display = 'none';
+      } else {
+        throw new Error('server error');
+      }
+    })
+    .catch(function() {
+      /* Fallback: Shopify /contact form (always works) */
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/contact';
+      form.style.display = 'none';
+
+      var fields = {
+        form_type: 'contact',
+        utf8:      '✓',
+        'contact[email]':   email,
+        'contact[subject]': 'Drop Notify — ' + (dropMeta || 'Coming Soon'),
+        'contact[body]':    'Email: ' + email + '\n\nDrop: ' + (dropMeta || '') + '\n' + (dropDesc || '') + '\n\nThis customer wants to be notified when the drop launches.'
+      };
+
+      Object.keys(fields).forEach(function(k) {
+        var inp = document.createElement('input');
+        inp.type  = 'hidden';
+        inp.name  = k;
+        inp.value = fields[k];
+        form.appendChild(inp);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+    });
+
+    if (btn) {
+      setTimeout(function() {
+        if (btn.disabled) {
+          btn.disabled    = false;
+          btn.textContent = btn.getAttribute('data-label') || 'NOTIFY ME';
+        }
+      }, 8000);
+    }
+  };
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Worlds — Drops",
+  "tag": "section",
+  "class": "worlds-drops-section-wrapper",
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "Section Layout"
+    },
+    {
+      "type": "range",
+      "id": "section_max_width",
+      "label": "Max Width (px)",
+      "min": 900,
+      "max": 1800,
+      "step": 20,
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "section_padding_x",
+      "label": "Side Padding (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Padding Top (px)",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Padding Bottom (px)",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "panel_min_height",
+      "label": "Panel Min Height (px)",
+      "min": 300,
+      "max": 800,
+      "step": 20,
+      "default": 460
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "label": "Gap Between Drops (px)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "select",
+      "id": "font_family",
+      "label": "Font Family",
+      "options": [
+        { "value": "inherit", "label": "Theme Default" },
+        { "value": "Arial Black", "label": "Arial Black" },
+        { "value": "Georgia", "label": "Georgia" },
+        { "value": "Helvetica Neue", "label": "Helvetica Neue" },
+        { "value": "Impact", "label": "Impact" },
+        { "value": "Futura", "label": "Futura" }
+      ],
+      "default": "inherit"
+    },
+
+    {
+      "type": "header",
+      "content": "Section Header Text"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Label",
+      "default": "WORLDS"
+    },
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "Section Heading",
+      "default": "TWO DROPS. ONE ETHOS."
+    },
+    {
+      "type": "text",
+      "id": "all_drops_label",
+      "label": "All Drops Link Label",
+      "default": "ALL DROPS"
+    },
+    {
+      "type": "url",
+      "id": "all_drops_url",
+      "label": "All Drops Link URL"
+    },
+
+    {
+      "type": "header",
+      "content": "Section Colors"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section Background",
+      "default": "#EEE9E1"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#0D0D0D"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Eyebrow Label Color",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "all_drops_color",
+      "label": "All Drops Link Color",
+      "default": "#0D0D0D"
+    },
+    {
+      "type": "color",
+      "id": "all_drops_hover_color",
+      "label": "All Drops Link Hover Color",
+      "default": "#555555"
+    },
+
+    {
+      "type": "header",
+      "content": "Right Panel Colors (Launched Drops)"
+    },
+    {
+      "type": "color",
+      "id": "panel_right_bg_color",
+      "label": "Right Panel Background",
+      "default": "#E5E0D8"
+    },
+    {
+      "type": "color",
+      "id": "meta_text_color",
+      "label": "Meta Text Color",
+      "default": "#888888"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description Text Color",
+      "default": "#222222"
+    },
+
+    {
+      "type": "header",
+      "content": "Default Primary Button (Section-wide)"
+    },
+    {
+      "type": "color",
+      "id": "btn_primary_bg",
+      "label": "Primary Button BG",
+      "default": "#0D0D0D"
+    },
+    {
+      "type": "color",
+      "id": "btn_primary_text_color",
+      "label": "Primary Button Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "btn_primary_hover_bg",
+      "label": "Primary Button Hover BG",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "btn_primary_hover_text_color",
+      "label": "Primary Button Hover Text",
+      "default": "#FFFFFF"
+    },
+
+    {
+      "type": "header",
+      "content": "Default Secondary Button (Section-wide)"
+    },
+    {
+      "type": "color",
+      "id": "btn_secondary_bg",
+      "label": "Secondary Button BG",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "btn_secondary_text_color",
+      "label": "Secondary Button Text",
+      "default": "#0D0D0D"
+    },
+    {
+      "type": "color",
+      "id": "btn_secondary_border_color",
+      "label": "Secondary Button Border",
+      "default": "#0D0D0D"
+    },
+    {
+      "type": "color",
+      "id": "btn_secondary_hover_bg",
+      "label": "Secondary Button Hover BG",
+      "default": "#0D0D0D"
+    },
+    {
+      "type": "color",
+      "id": "btn_secondary_hover_text_color",
+      "label": "Secondary Button Hover Text",
+      "default": "#FFFFFF"
+    },
+
+    {
+      "type": "header",
+      "content": "Live Badge Colors (Launched Drops)"
+    },
+    {
+      "type": "color",
+      "id": "live_badge_bg",
+      "label": "Live Badge Background",
+      "default": "#8B0000"
+    },
+    {
+      "type": "color",
+      "id": "live_badge_text_color",
+      "label": "Live Badge Text",
+      "default": "#FFFFFF"
+    },
+
+    {
+      "type": "header",
+      "content": "Default Drop Visual Colors"
+    },
+    {
+      "type": "color",
+      "id": "drop_label_color",
+      "label": "Drop Label Color",
+      "default": "#CCCCCC"
+    },
+    {
+      "type": "color",
+      "id": "drop_headline_color",
+      "label": "Drop Headline Color",
+      "default": "#7FFFED"
+    }
+
+  ],
+
+  "blocks": [
+
+    {
+      "type": "drop",
+      "name": "Drop (Launched)",
+      "settings": [
+
+        {
+          "type": "header",
+          "content": "Left Panel — Background"
+        },
+        {
+          "type": "paragraph",
+          "content": "Image takes priority over color if both are set."
+        },
+        {
+          "type": "image_picker",
+          "id": "bg_image",
+          "label": "Background Image (optional)"
+        },
+        {
+          "type": "select",
+          "id": "bg_image_position",
+          "label": "Image Position",
+          "options": [
+            { "value": "center center", "label": "Center" },
+            { "value": "top center", "label": "Top" },
+            { "value": "bottom center", "label": "Bottom" },
+            { "value": "left center", "label": "Left" },
+            { "value": "right center", "label": "Right" }
+          ],
+          "default": "center center"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background Color (fallback)",
+          "default": "#6B0000"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_texture_overlay",
+          "label": "Show Diagonal Texture Overlay",
+          "default": true
+        },
+
+        {
+          "type": "header",
+          "content": "Live Badge"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_live_badge",
+          "label": "Show Live Badge",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "live_badge_label",
+          "label": "Live Badge Text",
+          "default": "LIVE NOW"
+        },
+
+        {
+          "type": "header",
+          "content": "Drop Identity"
+        },
+        {
+          "type": "text",
+          "id": "drop_label",
+          "label": "Drop Label (e.g. DROP 01 / SS26)",
+          "default": "DROP 01 / SS26"
+        },
+        {
+          "type": "text",
+          "id": "drop_headline",
+          "label": "Drop Headline (large text)",
+          "default": "EARN YOUR FIT"
+        },
+
+        {
+          "type": "header",
+          "content": "Right Panel — Content"
+        },
+        {
+          "type": "text",
+          "id": "drop_meta",
+          "label": "Meta Line (e.g. 01 / 02 · LAUNCHED)",
+          "default": "01 / 02 · LAUNCHED"
+        },
+        {
+          "type": "richtext",
+          "id": "drop_description",
+          "label": "Description",
+          "default": "<p>Heavy cotton, salvaged hardware, hand-finished cuffs. The opening statement.</p>"
+        },
+
+        {
+          "type": "header",
+          "content": "Primary Button"
+        },
+        {
+          "type": "text",
+          "id": "btn_primary_label",
+          "label": "Primary Button Label",
+          "default": "SHOP THE DROP"
+        },
+        {
+          "type": "url",
+          "id": "btn_primary_url",
+          "label": "Primary Button URL"
+        },
+        {
+          "type": "color",
+          "id": "btn_primary_bg",
+          "label": "Override: Primary Button BG",
+          "default": "#0D0D0D"
+        },
+        {
+          "type": "color",
+          "id": "btn_primary_text",
+          "label": "Override: Primary Button Text",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "btn_primary_hover_bg",
+          "label": "Override: Primary Hover BG",
+          "default": "#333333"
+        },
+        {
+          "type": "color",
+          "id": "btn_primary_hover_text",
+          "label": "Override: Primary Hover Text",
+          "default": "#FFFFFF"
+        },
+
+        {
+          "type": "header",
+          "content": "Secondary Button"
+        },
+        {
+          "type": "text",
+          "id": "btn_secondary_label",
+          "label": "Secondary Button Label",
+          "default": "VIEW LOOKBOOK"
+        },
+        {
+          "type": "url",
+          "id": "btn_secondary_url",
+          "label": "Secondary Button URL"
+        },
+        {
+          "type": "color",
+          "id": "btn_secondary_bg",
+          "label": "Override: Secondary Button BG",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "btn_secondary_text",
+          "label": "Override: Secondary Button Text",
+          "default": "#0D0D0D"
+        },
+        {
+          "type": "color",
+          "id": "btn_secondary_border",
+          "label": "Override: Secondary Button Border",
+          "default": "#0D0D0D"
+        },
+        {
+          "type": "color",
+          "id": "btn_secondary_hover_bg",
+          "label": "Override: Secondary Hover BG",
+          "default": "#0D0D0D"
+        },
+        {
+          "type": "color",
+          "id": "btn_secondary_hover_text",
+          "label": "Override: Secondary Hover Text",
+          "default": "#FFFFFF"
+        }
+      ]
+    },
+
+    {
+      "type": "coming_soon",
+      "name": "Drop (Coming Soon)",
+      "settings": [
+
+        {
+          "type": "header",
+          "content": "Left Column — Info Panel"
+        },
+        {
+          "type": "image_picker",
+          "id": "left_bg_image",
+          "label": "Left Panel Background Image (optional)"
+        },
+        {
+          "type": "color",
+          "id": "left_panel_bg",
+          "label": "Left Panel Background Color",
+          "default": "#111111"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_left_texture",
+          "label": "Show Diagonal Texture on Left Panel",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "left_panel_text_color",
+          "label": "Left Panel General Text Color",
+          "default": "#FFFFFF"
+        },
+
+        {
+          "type": "header",
+          "content": "Meta & Description"
+        },
+        {
+          "type": "text",
+          "id": "cs_meta",
+          "label": "Meta Line (e.g. 02 / 02 · COMING SOON)",
+          "default": "02 / 02 · COMING SOON"
+        },
+        {
+          "type": "color",
+          "id": "cs_meta_color",
+          "label": "Meta Text Color",
+          "default": "#888888"
+        },
+        {
+          "type": "textarea",
+          "id": "cs_description",
+          "label": "Description Text",
+          "default": "After-dark capsule. Black on black, technical seams, monochrome reflectives. Launching May 27."
+        },
+        {
+          "type": "color",
+          "id": "cs_desc_color",
+          "label": "Description Text Color",
+          "default": "#CCCCCC"
+        },
+
+        {
+          "type": "header",
+          "content": "Countdown Timer"
+        },
+        {
+          "type": "paragraph",
+          "content": "Enter the launch date/time in ISO 8601 format, e.g. 2026-05-27T00:00:00 (uses your server timezone). Leave blank to hide countdown."
+        },
+        {
+          "type": "text",
+          "id": "launch_datetime",
+          "label": "Launch Date/Time (ISO 8601)",
+          "default": "2026-05-27T00:00:00"
+        },
+        {
+          "type": "color",
+          "id": "countdown_color",
+          "label": "Countdown Number Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "countdown_label_color",
+          "label": "Countdown Label Color",
+          "default": "#666666"
+        },
+        {
+          "type": "text",
+          "id": "countdown_label_days",
+          "label": "Days Label",
+          "default": "DAYS"
+        },
+        {
+          "type": "text",
+          "id": "countdown_label_hours",
+          "label": "Hours Label",
+          "default": "HOURS"
+        },
+        {
+          "type": "text",
+          "id": "countdown_label_mins",
+          "label": "Minutes Label",
+          "default": "MIN"
+        },
+        {
+          "type": "text",
+          "id": "countdown_label_secs",
+          "label": "Seconds Label",
+          "default": "SEC"
+        },
+
+        {
+          "type": "header",
+          "content": "Email Notify Form"
+        },
+        {
+          "type": "paragraph",
+          "content": "When a customer submits their email, it is sent to Shopify as a Contact form submission (visible in Admin › Orders › Contacts) with the drop details in the message body. A fallback also creates a Shopify customer record tagged 'drop-notify'."
+        },
+        {
+          "type": "text",
+          "id": "notify_placeholder",
+          "label": "Email Input Placeholder",
+          "default": "your@email.com"
+        },
+        {
+          "type": "text",
+          "id": "notify_btn_label",
+          "label": "Notify Button Label",
+          "default": "NOTIFY ME"
+        },
+        {
+          "type": "color",
+          "id": "notify_btn_bg",
+          "label": "Notify Button Background",
+          "default": "#8B0000"
+        },
+        {
+          "type": "color",
+          "id": "notify_btn_text_color",
+          "label": "Notify Button Text Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "notify_input_bg",
+          "label": "Email Input Background",
+          "default": "#1A1A1A"
+        },
+        {
+          "type": "color",
+          "id": "notify_input_text_color",
+          "label": "Email Input Text Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "notify_input_border_color",
+          "label": "Email Input Border Color",
+          "default": "#333333"
+        },
+        {
+          "type": "text",
+          "id": "notify_success_msg",
+          "label": "Success Message",
+          "default": "You're on the list. Watch this space."
+        },
+        {
+          "type": "text",
+          "id": "notify_error_msg",
+          "label": "Error Message",
+          "default": "Something went wrong. Please try again."
+        },
+
+        {
+          "type": "header",
+          "content": "Teaser Link"
+        },
+        {
+          "type": "text",
+          "id": "teaser_label",
+          "label": "Teaser Link Label",
+          "default": "SEE THE TEASER"
+        },
+        {
+          "type": "url",
+          "id": "teaser_url",
+          "label": "Teaser Link URL"
+        },
+        {
+          "type": "color",
+          "id": "teaser_link_color",
+          "label": "Teaser Link Color",
+          "default": "#FFFFFF"
+        },
+
+        {
+          "type": "header",
+          "content": "Right Column — Visual Panel"
+        },
+        {
+          "type": "image_picker",
+          "id": "right_bg_image",
+          "label": "Right Panel Background Image (optional)"
+        },
+        {
+          "type": "select",
+          "id": "right_bg_image_position",
+          "label": "Image Position",
+          "options": [
+            { "value": "center center", "label": "Center" },
+            { "value": "top center", "label": "Top" },
+            { "value": "bottom center", "label": "Bottom" },
+            { "value": "left center", "label": "Left" },
+            { "value": "right center", "label": "Right" }
+          ],
+          "default": "center center"
+        },
+        {
+          "type": "color",
+          "id": "right_bg_color",
+          "label": "Right Panel Background Color",
+          "default": "#0A0A0A"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_right_texture",
+          "label": "Show Diagonal Texture on Right Panel",
+          "default": false
+        },
+
+        {
+          "type": "header",
+          "content": "Coming Soon Badge"
+        },
+        {
+          "type": "text",
+          "id": "coming_soon_badge_label",
+          "label": "Badge Label",
+          "default": "COMING SOON"
+        },
+        {
+          "type": "color",
+          "id": "coming_soon_badge_bg",
+          "label": "Badge Background",
+          "default": "transparent"
+        },
+        {
+          "type": "color",
+          "id": "coming_soon_badge_text",
+          "label": "Badge Text / Border Color",
+          "default": "#FFFFFF"
+        },
+
+        {
+          "type": "header",
+          "content": "Drop Identity (Right Panel)"
+        },
+        {
+          "type": "text",
+          "id": "cs_drop_label",
+          "label": "Drop Label (e.g. DROP 02 / CAPSULE)",
+          "default": "DROP 02 / CAPSULE"
+        },
+        {
+          "type": "color",
+          "id": "cs_drop_label_color",
+          "label": "Drop Label Color",
+          "default": "#777777"
+        },
+        {
+          "type": "text",
+          "id": "cs_drop_headline",
+          "label": "Drop Headline (large text)",
+          "default": "OFF—HOURS"
+        },
+        {
+          "type": "color",
+          "id": "cs_drop_headline_color",
+          "label": "Drop Headline Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "text",
+          "id": "launch_date_display",
+          "label": "Launch Date Display Text (e.g. 27.05.2026)",
+          "default": "27.05.2026"
+        },
+        {
+          "type": "color",
+          "id": "launch_date_color",
+          "label": "Launch Date Color",
+          "default": "#666666"
+        }
+
+      ]
+    }
+
+  ],
+
+  "presets": [
+    {
+      "name": "Worlds — Drops",
+      "blocks": [
+        {
+          "type": "drop",
+          "settings": {
+            "bg_color": "#6B0000",
+            "show_texture_overlay": true,
+            "show_live_badge": true,
+            "live_badge_label": "LIVE NOW",
+            "drop_label": "DROP 01 / SS26",
+            "drop_headline": "EARN YOUR FIT",
+            "drop_meta": "01 / 02 · LAUNCHED",
+            "drop_description": "<p>Heavy cotton, salvaged hardware, hand-finished cuffs. The opening statement.</p>",
+            "btn_primary_label": "SHOP THE DROP",
+            "btn_secondary_label": "VIEW LOOKBOOK"
+          }
+        },
+        {
+          "type": "coming_soon",
+          "settings": {
+            "left_panel_bg": "#111111",
+            "cs_meta": "02 / 02 · COMING SOON",
+            "cs_description": "After-dark capsule. Black on black, technical seams, monochrome reflectives. Launching May 27.",
+            "launch_datetime": "2026-05-27T00:00:00",
+            "notify_btn_label": "NOTIFY ME",
+            "notify_placeholder": "your@email.com",
+            "teaser_label": "SEE THE TEASER",
+            "right_bg_color": "#0A0A0A",
+            "coming_soon_badge_label": "COMING SOON",
+            "cs_drop_label": "DROP 02 / CAPSULE",
+            "cs_drop_headline": "OFF—HOURS",
+            "launch_date_display": "27.05.2026"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,738 @@
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+{{ 'template-collection.css' | asset_url | stylesheet_tag }}
+
+{% if section.settings.image_shape == 'blob' %}
+  {{ 'mask-blobs.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+
+{%- unless section.settings.quick_add == 'none' -%}
+  {{ 'quick-add.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+{%- endunless -%}
+
+{%- if section.settings.quick_add == 'standard' -%}
+  <script src="{{ 'quick-add.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{%- if section.settings.quick_add == 'bulk' -%}
+  <script src="{{ 'quick-add-bulk.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'price-per-item.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'quick-order-list.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+  .fc-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 30px 0px 0px;
+  }
+
+  .fc-header__left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .fc-subtitle {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #666;
+    margin: 0;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+
+  .fc-title {
+    font-size: 56px;
+    text-transform: uppercase !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    color: #111 !important;
+  }
+
+  .fc-view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #111;
+  white-space: nowrap;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.fc-view-all .arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+/* Hover Effects */
+.fc-view-all:hover {
+  opacity: 0.55;
+}
+
+.fc-view-all:hover .arrow {
+  transform: translateX(5px);
+}
+
+  .fc-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns_desktop }}, 1fr);
+    gap: 16px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .fc-grid {
+      grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+      gap: 10px;
+    }
+  }
+
+  /* ════════════════════════════════════════
+     PRODUCT CARD
+  ════════════════════════════════════════ */
+  .fc-card {
+    position: relative;
+    background: transparent;
+  }
+
+  /* Fixed aspect-ratio image box — portrait 4:5 keeps all cards same height */
+  .fc-card__img-wrap {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    background: #dedede;
+  }
+
+  .fc-card__img-wrap img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+    transition: transform 0.45s ease;
+  }
+
+  .fc-card:hover .fc-card__img-wrap img {
+    transform: scale(1.05);
+  }
+
+  /* placeholder SVG fills the box */
+  .fc-card__img-wrap .placeholder-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ── Badges (top-left) ── */
+  .fc-card__badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  .fc-badge {
+    display: inline-block;
+    padding: 4px 9px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .fc-badge--new {
+    background: #111;
+    color: #fff;
+  }
+
+  .fc-badge--sale {
+    background: #c0392b;
+    color: #fff;
+  }
+
+  /* ── Bookmark / Wishlist icon (top-right) ── */
+  .fc-card__wishlist {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 4;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 0;
+    transition: opacity 0.2s;
+  }
+
+  .fc-card__wishlist:hover {
+    opacity: 0.65;
+  }
+
+  .fc-card__wishlist svg {
+    width: 22px;
+    height: 22px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.6));
+    transition: fill 0.2s;
+  }
+
+  .fc-card__wishlist.is-saved svg {
+    fill: #fff;
+  }
+
+  /* ── Quick Add button (slides up on hover) ── */
+  .fc-card__quick-add {
+    position: absolute;
+    bottom: 0px;
+    left: 12px;
+    right: 12px;
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.85);
+    color: rgb(11, 11, 11);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    padding: 14px 12px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    display: block;
+    border-radius: 7px;
+  }
+
+  .fc-card:hover .fc-card__quick-add {
+    transform: translateY(0);
+    bottom: 12px;
+  }
+
+  /* ── Card info below image ── */
+  .fc-card__info {
+    padding: 12px 0 4px;
+  }
+
+  .fc-card__title {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgb(11, 11, 11);
+    margin: 0 0 5px;
+    line-height: 1.35;
+  }
+
+  .fc-card__price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: rgb(11, 11, 11);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .fc-card__price-compare {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 12px;
+  }
+
+  .fc-card__price-sale {
+    color: rgb(11, 11, 11);
+    font-weight: 600;
+  }
+
+  /* ── Description ── */
+  .fc-description {
+    margin-bottom: 20px;
+  }
+  #shopify-section-template--21099631181987__featured_collection_A7bMDM .page-width{
+    max-width: 1600px;
+  }
+  #shopify-section-template--21099631181987__featured_collection_A7bMDM .color-scheme-1{
+    background: #F5F2EC !important;
+  }
+  @media(max-width: 768px){
+    .fc-title{
+      font-size: 28px;
+    }
+    .fc-subtitle,
+    .fc-view-all{
+      font-size: 11px;
+    }
+    .fc-card__title,
+    .fc-card__price{
+      font-size: 13px;
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign products_to_display = section.settings.collection.all_products_count
+
+  if section.settings.collection.all_products_count > section.settings.products_to_show
+    assign products_to_display = section.settings.products_to_show
+    assign more_in_collection = true
+  endif
+
+  assign columns_mobile_int = section.settings.columns_mobile | plus: 0
+  assign columns_desktop_int = section.settings.columns_desktop | plus: 0
+-%}
+
+<div class="color-{{ section.settings.color_scheme }} isolate gradient">
+  <div
+    class="collection section-{{ section.id }}-padding{% if section.settings.full_width %} collection--full-width{% endif %}"
+    id="collection-{{ section.id }}"
+    data-id="{{ section.id }}"
+  >
+    <div class="{% unless section.settings.full_width %}page-width{% endunless %}">
+
+      {%- comment -%} ── Section Header ── {%- endcomment -%}
+      <div class="fc-header{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        <div class="fc-header__left">
+          {%- if section.settings.subtitle != blank -%}
+            <p class="fc-subtitle">{{ section.settings.subtitle }}</p>
+          {%- endif -%}
+          {%- if section.settings.title != blank -%}
+            <h2 class="fc-title">{{ section.settings.title }}</h2>
+          {%- endif -%}
+        </div>
+        {%- if section.settings.show_view_all and more_in_collection -%}
+          <a
+            href="{{ section.settings.collection.url }}"
+            class="fc-view-all"
+            aria-label="{{ 'sections.featured_collection.view_all_label' | t: collection_name: section.settings.collection.title | escape }}"
+          >
+            View All {{ section.settings.collection.all_products_count }} 
+            <span class="arrow">&rarr;</span>
+          </a>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} ── Description ── {%- endcomment -%}
+      {%- if section.settings.description != blank or section.settings.show_description and section.settings.collection.description != empty -%}
+        <div class="fc-description {{ section.settings.description_style }} rte">
+          {%- if section.settings.show_description -%}
+            {{ section.settings.collection.description }}
+          {%- else -%}
+            {{ section.settings.description }}
+          {%- endif %}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} ── Product Grid ── {%- endcomment -%}
+      {%- if section.settings.collection.products.size > 0 -%}
+        <ul class="fc-grid" role="list">
+          {% paginate section.settings.collection.products by section.settings.products_to_show %}
+            {%- for product in section.settings.collection.products limit: section.settings.products_to_show -%}
+
+              {%- comment -%} Badge detection {%- endcomment -%}
+              {%- assign is_new = false -%}
+              {%- assign is_on_sale = false -%}
+              {%- if product.tags contains 'new' or product.tags contains 'New' or product.tags contains 'NEW' -%}
+                {%- assign is_new = true -%}
+              {%- endif -%}
+              {%- if product.compare_at_price > product.price and product.compare_at_price != blank -%}
+                {%- assign is_on_sale = true -%}
+              {%- endif -%}
+
+              <li
+                id="Slide-{{ section.id }}-{{ forloop.index }}"
+                {% if settings.animations_reveal_on_scroll %}
+                  class="scroll-trigger animate--slide-in"
+                  data-cascade
+                  style="--animation-order: {{ forloop.index }};"
+                {% endif %}
+              >
+                <div class="fc-card">
+
+                  <div class="fc-card__img-wrap">
+
+                    {%- comment -%} Badges {%- endcomment -%}
+                    {%- if is_new or is_on_sale -%}
+                      <div class="fc-card__badges">
+                        {%- if is_new -%}<span class="fc-badge fc-badge--new">New</span>{%- endif -%}
+                        {%- if is_on_sale -%}<span class="fc-badge fc-badge--sale">Sale</span>{%- endif -%}
+                      </div>
+                    {%- endif -%}
+
+                    {%- comment -%} Bookmark icon {%- endcomment -%}
+                    {% comment %} <button
+                      class="fc-card__wishlist"
+                      aria-label="Save {{ product.title | escape }}"
+                      onclick="this.classList.toggle('is-saved')"
+                      type="button"
+                    >
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                      </svg>
+                    </button> {% endcomment %}
+
+                    {%- comment -%} Product image {%- endcomment -%}
+                    <a href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+                      {%- if product.featured_media -%}
+                        <img
+                          src="{{ product.featured_media | image_url: width: 800 }}"
+                          alt="{{ product.featured_media.alt | escape }}"
+                          loading="{% if forloop.index <= columns_desktop_int %}eager{% else %}lazy{% endif %}"
+                          width="800"
+                          height="1000"
+                        >
+                      {%- else -%}
+                        {%- assign ridx = forloop.index -%}
+                        {%- assign placeholder_image = 'product-apparel-' | append: ridx -%}
+                        {{ placeholder_image | placeholder_svg_tag: 'placeholder-svg' }}
+                      {%- endif -%}
+                    </a>
+
+                    {%- comment -%} Quick Add {%- endcomment -%}
+                    <a href="{{ product.url }}" class="fc-card__quick-add">Quick Add +</a>
+
+                  </div>
+
+                  <div class="fc-card__info">
+                    <p class="fc-card__title">{{ product.title }}</p>
+                    <div class="fc-card__price">
+                      {%- if is_on_sale -%}
+                        <span class="fc-card__price-sale">{{ product.price | money_without_trailing_zeros }}</span>
+                        <span class="fc-card__price-compare">{{ product.compare_at_price | money_without_trailing_zeros }}</span>
+                      {%- else -%}
+                        <span>{{ product.price | money_without_trailing_zeros }}</span>
+                      {%- endif -%}
+                    </div>
+                  </div>
+
+                </div>
+              </li>
+
+            {%- endfor -%}
+          {% endpaginate %}
+        </ul>
+
+      {%- else -%}
+        {%- comment -%} Placeholder when no collection selected {%- endcomment -%}
+        <ul class="fc-grid" role="list">
+          {%- for i in (1..section.settings.columns_desktop) -%}
+            <li>
+              {% liquid
+                assign ridx = forloop.rindex
+                case ridx
+                  when 5
+                    assign ridx = 1
+                  when 6
+                    assign ridx = 2
+                endcase
+              %}
+              {%- assign placeholder_image = 'product-apparel-' | append: ridx -%}
+              <div class="fc-card">
+                <div class="fc-card__img-wrap">
+                  {{ placeholder_image | placeholder_svg_tag: 'placeholder-svg' }}
+                </div>
+                <div class="fc-card__info">
+                  <p class="fc-card__title">Product title</p>
+                  <div class="fc-card__price"><span>Rs. 0.00 INR</span></div>
+                </div>
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- comment -%} Bottom View All — shows only when no title exists {%- endcomment -%}
+      {%- if section.settings.show_view_all and more_in_collection and section.settings.title == blank -%}
+        <div class="center collection__view-all{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" style="margin-top:32px;">
+          <a
+            href="{{ section.settings.collection.url }}"
+            class="{% if section.settings.view_all_style == 'link' %}link underlined-link{% elsif section.settings.view_all_style == 'solid' %}button{% else %}button button--secondary{% endif %}"
+            aria-label="{{ 'sections.featured_collection.view_all_label' | t: collection_name: section.settings.collection.title | escape }}"
+          >
+            {{ 'sections.featured_collection.view_all' | t }}
+          </a>
+        </div>
+      {%- endif -%}
+
+    </div>
+
+    {% if section.settings.image_shape == 'arch' %}
+      {{ 'mask-arch.svg' | inline_asset_content }}
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.featured-collection.name",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:sections.featured-collection.settings.collection.label"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 25,
+      "step": 1,
+      "default": 4,
+      "label": "t:sections.featured-collection.settings.products_to_show.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.featured-collection.settings.header_text.content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle (above heading)",
+      "placeholder": "e.g. Earn Your Fit Vol. I"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "default": "t:sections.featured-collection.settings.title.default",
+      "label": "t:sections.featured-collection.settings.title.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        { "value": "h2",   "label": "t:sections.all.heading_size.options__1.label" },
+        { "value": "h1",   "label": "t:sections.all.heading_size.options__2.label" },
+        { "value": "h0",   "label": "t:sections.all.heading_size.options__3.label" },
+        { "value": "hxl",  "label": "t:sections.all.heading_size.options__4.label" },
+        { "value": "hxxl", "label": "t:sections.all.heading_size.options__5.label" }
+      ],
+      "default": "h1",
+      "label": "t:sections.all.heading_size.label"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "t:sections.featured-collection.settings.description.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "t:sections.featured-collection.settings.show_description.label",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "description_style",
+      "label": "t:sections.featured-collection.settings.description_style.label",
+      "options": [
+        { "value": "body",      "label": "t:sections.featured-collection.settings.description_style.options__1.label" },
+        { "value": "subtitle",  "label": "t:sections.featured-collection.settings.description_style.options__2.label" },
+        { "value": "uppercase", "label": "t:sections.featured-collection.settings.description_style.options__3.label" }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.featured-collection.settings.header_collection.content"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 3,
+      "label": "t:sections.featured-collection.settings.columns_desktop.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_desktop_slider",
+      "label": "t:sections.featured-collection.settings.enable_desktop_slider.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:sections.featured-collection.settings.full_width.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "default": true,
+      "label": "t:sections.featured-collection.settings.show_view_all.label",
+      "info": "t:sections.featured-collection.settings.show_view_all.info"
+    },
+    {
+      "type": "select",
+      "id": "view_all_style",
+      "label": "t:sections.featured-collection.settings.view_all_style.label",
+      "options": [
+        { "value": "link",    "label": "t:sections.featured-collection.settings.view_all_style.options__1.label" },
+        { "value": "outline", "label": "t:sections.featured-collection.settings.view_all_style.options__2.label" },
+        { "value": "solid",   "label": "t:sections.featured-collection.settings.view_all_style.options__3.label" }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "info": "t:sections.all.colors.has_cards_info",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.featured-collection.settings.header.content"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        { "value": "adapt",    "label": "t:sections.featured-collection.settings.image_ratio.options__1.label" },
+        { "value": "portrait", "label": "t:sections.featured-collection.settings.image_ratio.options__2.label" },
+        { "value": "square",   "label": "t:sections.featured-collection.settings.image_ratio.options__3.label" }
+      ],
+      "default": "portrait",
+      "label": "t:sections.featured-collection.settings.image_ratio.label"
+    },
+    {
+      "type": "select",
+      "id": "image_shape",
+      "options": [
+        { "value": "default",       "label": "t:sections.all.image_shape.options__1.label" },
+        { "value": "arch",          "label": "t:sections.all.image_shape.options__2.label" },
+        { "value": "blob",          "label": "t:sections.all.image_shape.options__3.label" },
+        { "value": "chevronleft",   "label": "t:sections.all.image_shape.options__4.label" },
+        { "value": "chevronright",  "label": "t:sections.all.image_shape.options__5.label" },
+        { "value": "diamond",       "label": "t:sections.all.image_shape.options__6.label" },
+        { "value": "parallelogram", "label": "t:sections.all.image_shape.options__7.label" },
+        { "value": "round",         "label": "t:sections.all.image_shape.options__8.label" }
+      ],
+      "default": "default",
+      "label": "t:sections.all.image_shape.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "default": false,
+      "label": "t:sections.featured-collection.settings.show_secondary_image.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "default": false,
+      "label": "t:sections.featured-collection.settings.show_vendor.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "default": false,
+      "label": "t:sections.featured-collection.settings.show_rating.label",
+      "info": "t:sections.featured-collection.settings.show_rating.info"
+    },
+    {
+      "type": "select",
+      "id": "quick_add",
+      "default": "none",
+      "label": "t:sections.main-collection-product-grid.settings.quick_add.label",
+      "options": [
+        { "value": "none",     "label": "t:sections.main-collection-product-grid.settings.quick_add.options.option_1" },
+        { "value": "standard", "label": "t:sections.main-collection-product-grid.settings.quick_add.options.option_2" },
+        { "value": "bulk",     "label": "t:sections.main-collection-product-grid.settings.quick_add.options.option_3" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:sections.featured-collection.settings.header_mobile.content"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "default": "1",
+      "label": "t:sections.featured-collection.settings.columns_mobile.label",
+      "options": [
+        { "value": "1", "label": "t:sections.featured-collection.settings.columns_mobile.options__1.label" },
+        { "value": "2", "label": "t:sections.featured-collection.settings.columns_mobile.options__2.label" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "swipe_on_mobile",
+      "default": false,
+      "label": "t:sections.featured-collection.settings.swipe_on_mobile.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.featured-collection.presets.name"
+    }
+  ]
+}
+{% endschema %}

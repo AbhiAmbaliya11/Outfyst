@@ -1,0 +1,101 @@
+{%- style -%}
+  .product-specs__wrapper {
+    margin: 20px 0;
+    width: 100%;
+    max-width: 585px; /* Optional: adjust based on your layout */
+  }
+
+  .product-specs__title {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: block;
+    color: #000;
+  }
+
+  .product-specs__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-specs__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  /* Optional: Add top border to the first visible item only */
+  .product-specs__item:first-of-type {
+    border-top: 1px solid #e8e8e8;
+  }
+
+  .product-specs__label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+    flex: 1;
+  }
+
+  .product-specs__value {
+    font-size: 14px;
+    font-weight: 400;
+    color: #4B5563;
+    text-align: right;
+    flex: 2;
+  }
+{%- endstyle -%}
+
+{%- capture specs_content -%}
+  {%- comment -%} FIT {%- endcomment -%}
+  {%- if product.metafields.custom.product_fit != blank -%}
+    <div class="product-specs__item">
+      <span class="product-specs__label">Fit</span>
+      <span class="product-specs__value">{{ product.metafields.custom.product_fit }}</span>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} FABRIC {%- endcomment -%}
+  {%- if product.metafields.custom.product_fabric != blank -%}
+    <div class="product-specs__item">
+      <span class="product-specs__label">Fabric</span>
+      <span class="product-specs__value">{{ product.metafields.custom.product_fabric }}</span>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} WEIGHT {%- endcomment -%}
+  {%- if product.metafields.custom.product_weight != blank -%}
+    <div class="product-specs__item">
+      <span class="product-specs__label">Weight</span>
+      <span class="product-specs__value">{{ product.metafields.custom.product_weight }}</span>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} WASH {%- endcomment -%}
+  {%- if product.metafields.custom.product_wash != blank -%}
+    <div class="product-specs__item">
+      <span class="product-specs__label">Wash</span>
+      <span class="product-specs__value">{{ product.metafields.custom.product_wash }}</span>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} MADE IN {%- endcomment -%}
+  {%- if product.metafields.custom.product_made_in != blank -%}
+    <div class="product-specs__item">
+      <span class="product-specs__label">Made in</span>
+      <span class="product-specs__value">{{ product.metafields.custom.product_made_in }}</span>
+    </div>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- comment -%} Only show the entire block if at least one metafield has a value {%- endcomment -%}
+{%- if specs_content != blank -%}
+  <div class="product-specs__wrapper">
+    <strong class="product-specs__title">SPECIFICATIONS</strong>
+    <div class="product-specs__list">
+      {{ specs_content }}
+    </div>
+  </div>
+{%- endif -%}

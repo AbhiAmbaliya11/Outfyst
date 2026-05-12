@@ -1,0 +1,240 @@
+{% comment %}
+  Renders a collection card
+
+  Accepts:
+  - card_collection: {Object} Collection Liquid object
+  - media_aspect_ratio: {String} Size of the product image card. Values are "square", "portrait" and "adapt". Default is "portrait" (optional)
+  - columns: {Number}
+  - extend_height: {Boolean} Card height extends to available container space. Default: false (optional)
+  - wrapper_class: {String} Wrapper class for card (optional)
+  - placeholder_image: {String} Placeholder image when collection is empty (optional)
+  - card_index: {Number} Index of the card for numbering (optional)
+
+  Usage:
+  {% render 'card-collection', card_collection: collection, columns: 3, card_index: forloop.index %}
+{% endcomment %}
+
+{%- liquid
+  assign ratio = 0.8
+  if card_collection.featured_image and media_aspect_ratio == 'square'
+    assign ratio = 1
+  elsif card_collection.featured_image and media_aspect_ratio == 'adapt'
+    assign ratio = card_collection.featured_image.aspect_ratio
+  endif
+  if ratio == 0 or ratio == null
+    assign ratio = 0.8
+  endif
+  assign card_color_scheme = settings.card_color_scheme
+  assign card_style = settings.card_style
+  if wrapper_class == null or wrapper_class == 'none'
+    assign card_color_scheme = settings.collection_card_color_scheme
+    assign card_style = settings.collection_card_style
+  endif
+
+  assign display_index = card_index | default: forloop.index | default: 1
+  if display_index < 10
+    assign index_padded = display_index | prepend: '0'
+  else
+    assign index_padded = display_index
+  endif
+-%}
+
+<style>
+  .custom-coll-card-wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+
+  .custom-coll-card {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #EBEBEB;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Image area — portrait aspect ratio */
+  .custom-coll-card__media {
+    position: relative;
+    width: 100%;
+    padding-top: 125%; /* portrait 4:5 */
+    overflow: hidden;
+    display: block;
+  }
+
+  .custom-coll-card__media img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .custom-coll-card:hover .custom-coll-card__media img {
+    transform: scale(1.03);
+  }
+
+  /* No image placeholder */
+  .custom-coll-card__no-image {
+    position: relative;
+    width: 100%;
+    padding-top: 125%;
+    background: #EBEBEB;
+    display: block;
+  }
+
+  /* Meta row below image */
+  .custom-coll-card__meta {
+    gap: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0px;
+  }
+
+  .custom-coll-card__title {
+    text-transform: uppercase;
+    text-decoration: none;
+    line-height: 1.1;
+    margin: 0;
+    font-family: Manrope, sans-serif;
+    {% comment %} font-size: 12px;
+    color: rgb(11, 11, 11); {% endcomment %}
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+.custom-coll-card__title {
+  font-size: {{ section.settings.meta_title_size }}px;
+  color: {{ section.settings.meta_title_color }};
+}
+
+.custom-coll-card__number {
+  font-size: {{ section.settings.meta_number_size }}px;
+  color: {{ section.settings.meta_text_color }};
+}
+
+  .custom-coll-card__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .custom-coll-card__title a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .custom-coll-card__number {
+    font-family: 'Manrope', 'Arial', sans-serif;
+
+    font-weight: 400;
+
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* No-image card: title inside the box, bottom-left */
+  .custom-coll-card__no-image-inner {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+  }
+
+  .custom-coll-card__no-image-title {
+    font-family: 'Archivo Black', 'Arial Black', sans-serif;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: #0B0B0B;
+    text-decoration: none;
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .custom-coll-card__no-image-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Responsive */
+  @media screen and (max-width: 749px) {
+    .custom-coll-card__title {
+      font-size: 13px;
+    }
+    .custom-coll-card__no-image-title {
+      font-size: 14px;
+    }
+    .custom-coll-card__number {
+      font-size: 11px;
+    }
+    .custom-coll-card__meta {
+      padding: 10px 0 0;
+    }
+  }
+</style>
+
+<div class="custom-coll-card-wrapper card-wrapper animate-arrow {% if wrapper_class and wrapper_class != 'none' %}{{ wrapper_class }}{% else %}collection-card-wrapper{% endif %}">
+  <div class="custom-coll-card">
+
+    {%- if card_collection != blank and card_collection.featured_image -%}
+      {%- comment %} Card WITH image {%- endcomment %}
+      <a
+        href="{{ card_collection.url }}"
+        class="custom-coll-card__media"
+        aria-label="{{ card_collection.title | escape }}"
+        tabindex="-1"
+      >
+        <img
+          srcset="
+            {%- if card_collection.featured_image.width >= 330 -%}{{ card_collection.featured_image | image_url: width: 330 }} 330w,{%- endif -%}
+            {%- if card_collection.featured_image.width >= 535 -%}{{ card_collection.featured_image | image_url: width: 535 }} 535w,{%- endif -%}
+            {%- if card_collection.featured_image.width >= 750 -%}{{ card_collection.featured_image | image_url: width: 750 }} 750w,{%- endif -%}
+            {%- if card_collection.featured_image.width >= 1000 -%}{{ card_collection.featured_image | image_url: width: 1000 }} 1000w,{%- endif -%}
+            {%- if card_collection.featured_image.width >= 1500 -%}{{ card_collection.featured_image | image_url: width: 1500 }} 1500w,{%- endif -%}
+            {{ card_collection.featured_image | image_url }} {{ card_collection.featured_image.width }}w
+          "
+          src="{{ card_collection.featured_image | image_url: width: 700 }}"
+          sizes="
+            (min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 | divided_by: columns }}px,
+            (min-width: 750px) {% if columns > 1 %}calc((100vw - 10rem) / {{ columns }}){% else %}calc(100vw - 10rem){% endif %},
+            calc(100vw - 3rem)
+          "
+          alt="{{ card_collection.featured_image.alt | default: card_collection.title | escape }}"
+          height="{{ card_collection.featured_image.height }}"
+          width="{{ card_collection.featured_image.width }}"
+          loading="lazy"
+          class="motion-reduce"
+        >
+      </a>
+
+    {%- elsif card_collection == blank -%}
+      {%- comment %} Onboarding placeholder {%- endcomment %}
+      <div class="custom-coll-card__no-image">
+        {{ placeholder_image | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+
+
+    {%- else -%}
+      {%- comment %} Collection exists but NO image — title inside grey box, bottom-left {%- endcomment %}
+      <div class="custom-coll-card__no-image">        
+      </div>
+
+    {%- endif -%}
+  </div>
+        <div class="custom-coll-card__meta">
+          <span class="custom-coll-card__number">{{ index_padded }}</span>
+          <h3 class="custom-coll-card__title">
+            <a href="{{ card_collection.url }}" class="full-unstyled-link">
+              {{- card_collection.title | escape -}}
+            </a>
+          </h3>
+       </div>
+</div>

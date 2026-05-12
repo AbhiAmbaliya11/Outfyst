@@ -1,0 +1,1022 @@
+{% comment %}
+  OUTFYST-Style Hero Slider Section
+  Desktop: Full-screen 100vh with diagonal texture, bold typography
+  Mobile:  Card-peek layout — square card, light bg, dots below, SS26 label
+{% endcomment %}
+
+<style>
+  /* ── CSS VARIABLES ── */
+  #shopify-section-{{ section.id }} {
+    --accent-color: {{ section.settings.accent_color }};
+    --text-color: {{ section.settings.text_color }};
+    --transition-speed: {{ section.settings.transition_speed }}ms;
+    --overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+  }
+
+  .outfyst-slider-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: #0a0000;
+    cursor: grab;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+
+
+
+  .outfyst-slider-wrapper:active { cursor: grabbing; }
+
+  /* ── TOP METADATA ── */
+  .slider-meta-top {
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    z-index: 20;
+    text-align: right;
+    color: var(--text-color);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1.6;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+
+  /* ── BOTTOM DEBUG LABEL ── */
+  .slider-debug-label {
+    position: absolute;
+    bottom: 14px;
+    left: 24px;
+    z-index: 20;
+    color: var(--text-color);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  /* ── SCROLL INDICATOR ── */
+  .slider-scroll-hint {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    color: var(--text-color);
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .slider-scroll-hint::after {
+    content: 'v';
+    display: inline-block;
+    animation: bounce-down 1.6s ease-in-out infinite;
+  }
+  @keyframes bounce-down {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+  }
+
+  /* ── SLIDES TRACK ── */
+  .outfyst-slides-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform var(--transition-speed) cubic-bezier(0.76, 0, 0.24, 1);
+    will-change: transform;
+  }
+
+  /* ── INDIVIDUAL SLIDE ── */
+  .outfyst-slide {
+    position: relative;
+    min-width: 100%;
+    height: 100%;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* ── SLIDE BG IMAGE ── */
+  .slide-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.08);
+    transition: transform calc(var(--transition-speed) * 2) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+  .outfyst-slide.is-active .slide-bg { transform: scale(1); }
+
+  /* ── COLOR OVERLAY ── */
+  .slide-color-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--slide-overlay-color, #6b0000);
+    opacity: var(--overlay-opacity);
+    mix-blend-mode: multiply;
+    transition: background 0.6s ease, opacity 0.6s ease;
+  }
+  .outfyst-slide:hover .slide-color-overlay {
+    background: var(--slide-hover-color, #8b0000);
+    opacity: calc(var(--overlay-opacity) * 0.85);
+  }
+
+  /* ── DIAGONAL TEXTURE ── */
+  .slide-texture {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    background-image: repeating-linear-gradient(
+      -52deg,
+      transparent,
+      transparent 22px,
+      rgba(255,255,255,0.025) 22px,
+      rgba(255,255,255,0.025) 23px
+    );
+  }
+
+  /* ── VIGNETTE ── */
+  .slide-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background:
+      radial-gradient(ellipse 90% 80% at 80% 50%, transparent 30%, rgba(0,0,0,0.55) 100%),
+      linear-gradient(to right, rgba(0,0,0,0.45) 0%, transparent 60%);
+  }
+
+  /* ── CONTENT AREA ── */
+  .slide-content {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 0 80px 48px;
+  }
+
+  /* ── LIVE BADGE ── */
+  .slide-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-color);
+    color: var(--text-color);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    width: fit-content;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease 0s, transform 0.5s ease 0s;
+  }
+  .outfyst-slide.is-active .slide-live-badge {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-color);
+    animation: pulse-dot 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* ── EYEBROW ── */
+  .slide-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin-bottom: 16px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+  }
+  .outfyst-slide.is-active .slide-eyebrow {
+    opacity: 0.75;
+    transform: translateY(0);
+  }
+
+  /* ── HEADLINE ── */
+  .slide-headline {
+    font-size: clamp(52px, 6.5vw, 96px);
+    line-height: 0.85;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin: 0 0 32px;
+    max-width: 680px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease 0.22s, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
+  }
+  .outfyst-slide.is-active .slide-headline {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── BUTTONS ── */
+  .slide-buttons {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease 0.42s, transform 0.6s ease 0.42s;
+  }
+  .outfyst-slide.is-active .slide-buttons {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .slide-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 999px;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+    border: none;
+    white-space: nowrap;
+  }
+  .slide-btn:hover { transform: scale(1.04); }
+  .slide-btn--primary {
+    background: var(--text-color);
+    color: #111;
+  }
+  .slide-btn--primary:hover {
+    background: var(--accent-color);
+    color: var(--text-color);
+    box-shadow: 0 0 24px rgba(255,255,255,0.18);
+  }
+  .slide-btn--secondary {
+    background: rgba(255,255,255,0.12);
+    color: var(--text-color);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+  .slide-btn--secondary:hover {
+    background: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.5);
+  }
+
+  /* ── SS26 label inside card (mobile only, hidden desktop) ── */
+  .slide-mobile-meta { display: none; }
+
+  /* ── DESKTOP DOTS ── */
+  .outfyst-dots {
+    position: absolute;
+    bottom: 26px;
+    right: 36px;
+    z-index: 2;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .dot {
+    width: 28px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: background 0.3s ease, width 0.3s ease;
+    border: none;
+    padding: 0;
+  }
+  .dot.is-active {
+    background: var(--text-color);
+    width: 44px;
+  }
+
+  /* ── ARROWS ── */
+  .outfyst-arrows {
+    position: absolute;
+    bottom: 18px;
+    right: 130px;
+    z-index: 20;
+    display: flex;
+    gap: 8px;
+  }
+  .arrow-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(6px);
+    color: var(--text-color);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+  .arrow-btn:hover {
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.6);
+    transform: scale(1.08);
+  }
+
+  /* ── PROGRESS BAR ── */
+  .slide-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: var(--text-color);
+    opacity: 0.6;
+    z-index: 20;
+    width: 0%;
+    transition: none;
+  }
+  .slide-progress.animating { transition: width linear; }
+
+  @media (max-width: 768px) {
+
+    /* Wrapper stacks track + dots vertically */
+    .outfyst-slider-wrapper {
+      height: auto !important;
+      background: rgb(245, 242, 236);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 16px 0 18px;
+      cursor: default;
+    }
+    .outfyst-slider-wrapper:active { cursor: default; }
+
+    /* Hide all desktop-only elements */
+    .slider-meta-top    { display: none !important; }
+    .slider-debug-label { display: none !important; }
+    .slider-scroll-hint { display: none !important; }
+    .outfyst-arrows     { display: none !important; }
+    .slide-progress     { display: none !important; }
+    .slide-eyebrow      { display: none !important; }
+    .slide-buttons      { display: none !important; }
+
+    /* Track: flex row, left-padded; right overflow reveals next card */
+    .outfyst-slides-track {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      height: auto;
+      padding: 0 0 0 20px;
+      gap: 12px;
+    }
+
+    /* Card: square-ish portrait
+       Width = viewport - 20px left pad - 36px right peek */
+    .outfyst-slide {
+      flex-shrink: 0;
+      min-width: calc(100vw - 56px);
+      width: calc(100vw - 56px);
+      height: calc(100vw - 16px);
+      max-height: 430px;
+      min-height: 280px;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.26), 0 4px 12px rgba(0,0,0,0.12);
+      transform: scale(0.965);
+      transition: transform 0.45s cubic-bezier(0.22,1,0.36,1),
+                  box-shadow 0.45s ease;
+    }
+    .outfyst-slide.is-active {
+      transform: scale(1);
+      box-shadow: 0 20px 58px rgba(0,0,0,0.34), 0 6px 18px rgba(0,0,0,0.16);
+    }
+
+    /* Content bottom-left */
+    .slide-content {
+      padding: 0 0 24px 22px;
+      justify-content: flex-end;
+    }
+
+    /* Live badge — always visible, no JS animation on mobile */
+    .slide-live-badge {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+      font-size: 8px;
+      padding: 5px 10px 5px 8px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      letter-spacing: 0.12em;
+    }
+
+    /* Headline — always visible */
+    .slide-headline {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+      font-size: clamp(28px, 8.5vw, 46px);
+      line-height: 0.9;
+      margin-bottom: 0;
+      max-width: 88%;
+    }
+
+    /* SS26 top-right label inside card */
+    .slide-mobile-meta {
+      display: block;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 15;
+      color: var(--text-color);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      pointer-events: none;
+    }
+
+    /* Dots: static, centred below track */
+    .outfyst-dots {
+      position: static !important;
+      display: flex !important;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      margin-top: 14px;
+      transform: none !important;
+      right: auto !important;
+      bottom: auto !important;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.18);
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.3s ease, width 0.3s ease, border-radius 0.3s ease;
+    }
+    .dot.is-active {
+      width: 24px;
+      height: 8px;
+      border-radius: 4px;
+      background: #c0392b;
+    }
+  }
+
+  /* Very small phones */
+  @media (max-width: 380px) {
+    .outfyst-slide {
+      min-width: calc(100vw - 44px);
+      width: calc(100vw - 44px);
+      height: calc(100vw + 10px);
+      max-height: 370px;
+    }
+    .slide-headline { font-size: 26px; }
+  }
+</style>
+
+<div class="outfyst-slider-wrapper" id="outfyst-slider-{{ section.id }}" aria-label="Hero Slider">
+
+  {%- if section.settings.show_meta_label -%}
+  <div class="slider-meta-top">
+    {{ section.settings.meta_vol_label }}<br>
+    {{ section.settings.meta_shot_label }}
+  </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_debug_label -%}
+  <div class="slider-debug-label">Hero · 21:9 · Drop 01</div>
+  {%- endif -%}
+
+  {%- if section.settings.show_scroll_hint -%}
+  <div class="slider-scroll-hint">Scroll</div>
+  {%- endif -%}
+
+  <!-- SLIDES TRACK -->
+  <div class="outfyst-slides-track" id="track-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      {%- assign overlay_color = block.settings.overlay_color | default: '#6b0000' -%}
+      {%- assign hover_color   = block.settings.hover_color   | default: '#8b0000' -%}
+      <div
+        class="outfyst-slide{% if forloop.first %} is-active{% endif %}"
+        style="--slide-overlay-color: {{ overlay_color }}; --slide-hover-color: {{ hover_color }};"
+        data-index="{{ forloop.index0 }}"
+        {{ block.shopify_attributes }}
+      >
+        <!-- BG Image -->
+        {%- if block.settings.slide_image != blank -%}
+          {{ block.settings.slide_image | image_url: width: 2400 | image_tag:
+            class: 'slide-bg',
+            alt: block.settings.headline,
+            loading: 'eager',
+            widths: '600, 900, 1200, 1800, 2400'
+          }}
+        {%- else -%}
+          <div class="slide-bg" style="background: linear-gradient(135deg,#3a0000 0%,#6b0000 40%,#2a0000 100%);"></div>
+        {%- endif -%}
+
+        <div class="slide-color-overlay"></div>
+        <div class="slide-texture"></div>
+        <div class="slide-vignette"></div>
+
+        <!-- SS26 label mobile top-right -->
+        {%- if block.settings.show_card_label -%}
+        <div class="slide-mobile-meta">{{ block.settings.card_label }}</div>
+        {%- endif -%}
+
+        <!-- Content -->
+        <div class="slide-content">
+          {%- if block.settings.show_live_badge -%}
+          <div class="slide-live-badge">
+            <span class="live-dot"></span>
+            {{ block.settings.live_badge_text | default: 'Live Now' }}
+          </div>
+          {%- endif -%}
+
+          {%- if block.settings.eyebrow != blank -%}
+          <div class="slide-eyebrow">{{ block.settings.eyebrow }}</div>
+          {%- endif -%}
+
+          {%- if block.settings.headline != blank -%}
+          <h2 class="slide-headline">{{ block.settings.headline }}</h2>
+          {%- endif -%}
+
+          <div class="slide-buttons">
+            {%- if block.settings.btn1_label != blank -%}
+            <a href="{{ block.settings.btn1_link | default: '#' }}" class="slide-btn slide-btn--primary">
+              {{ block.settings.btn1_label }}{%- if block.settings.btn1_arrow %} &rarr;{%- endif -%}
+            </a>
+            {%- endif -%}
+            {%- if block.settings.btn2_label != blank -%}
+            <a href="{{ block.settings.btn2_link | default: '#' }}" class="slide-btn slide-btn--secondary">
+              {{ block.settings.btn2_label }}
+            </a>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <!-- Arrows (desktop only) -->
+  {%- if section.settings.show_arrows -%}
+  <div class="outfyst-arrows" aria-hidden="true">
+    <button class="arrow-btn" id="prev-{{ section.id }}" aria-label="Previous slide">&#8592;</button>
+    <button class="arrow-btn" id="next-{{ section.id }}" aria-label="Next slide">&#8594;</button>
+  </div>
+  {%- endif -%}
+
+  <!-- Dots -->
+  {%- if section.blocks.size > 1 -%}
+  <div class="outfyst-dots" role="tablist" aria-label="Slider navigation">
+    {%- for block in section.blocks -%}
+    <button
+      class="dot{% if forloop.first %} is-active{% endif %}"
+      data-index="{{ forloop.index0 }}"
+      role="tab"
+      aria-label="Go to slide {{ forloop.index }}"
+      aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+    ></button>
+    {%- endfor -%}
+  </div>
+  {%- endif -%}
+
+  {%- if section.settings.autoplay -%}
+  <div class="slide-progress" id="progress-{{ section.id }}"></div>
+  {%- endif -%}
+
+</div>
+
+<script>
+(function() {
+  var wrapper  = document.getElementById('outfyst-slider-{{ section.id }}');
+  if (!wrapper) return;
+
+  var track    = document.getElementById('track-{{ section.id }}');
+  var slides   = Array.from(track.querySelectorAll('.outfyst-slide'));
+  var dots     = Array.from(wrapper.querySelectorAll('.dot'));
+  var prevBtn  = document.getElementById('prev-{{ section.id }}');
+  var nextBtn  = document.getElementById('next-{{ section.id }}');
+  var progress = document.getElementById('progress-{{ section.id }}');
+
+  var AUTOPLAY    = {{ section.settings.autoplay | json }};
+  var AUTOPLAY_MS = {{ section.settings.autoplay_speed }};
+  var SPEED_MS    = {{ section.settings.transition_speed }};
+  var TOTAL       = slides.length;
+
+  var current    = 0;
+  var autoTimer  = null;
+  var progTimer  = null;
+  var isDragging = false;
+  var startX     = 0;
+  var dragDelta  = 0;
+
+  function isMobile() { return window.innerWidth <= 768; }
+
+  /* Calculate px offset for current index on mobile */
+  function getMobileOffset(index) {
+    var card = slides[0];
+    var gap  = 12;
+    return -((card.offsetWidth + gap) * index);
+  }
+
+  /* Apply transform */
+  function applyOffset(index, animate) {
+    track.style.transition = animate
+      ? ('transform ' + SPEED_MS + 'ms cubic-bezier(0.76,0,0.24,1)')
+      : 'none';
+
+    if (isMobile()) {
+      track.style.transform = 'translateX(' + getMobileOffset(index) + 'px)';
+    } else {
+      track.style.transform = 'translateX(-' + (index * 100) + '%)';
+    }
+  }
+
+  /* GOTO */
+  function goTo(index) {
+    if (index < 0) index = TOTAL - 1;
+    if (index >= TOTAL) index = 0;
+
+    slides[current].classList.remove('is-active');
+    if (dots[current]) { dots[current].classList.remove('is-active'); dots[current].setAttribute('aria-selected','false'); }
+
+    current = index;
+
+    slides[current].classList.add('is-active');
+    if (dots[current]) { dots[current].classList.add('is-active'); dots[current].setAttribute('aria-selected','true'); }
+
+    applyOffset(current, true);
+    resetProgress();
+    if (AUTOPLAY) startAutoplay();
+  }
+
+  /* Progress bar */
+  function resetProgress() {
+    if (!progress) return;
+    progress.classList.remove('animating');
+    progress.style.width = '0%';
+    clearTimeout(progTimer);
+    progTimer = setTimeout(function() {
+      progress.classList.add('animating');
+      progress.style.transition = 'width ' + AUTOPLAY_MS + 'ms linear';
+      progress.style.width = '100%';
+    }, 30);
+  }
+
+  /* Autoplay */
+  function startAutoplay() {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(function() { goTo(current + 1); }, AUTOPLAY_MS);
+  }
+  function stopAutoplay() {
+    clearInterval(autoTimer);
+    clearTimeout(progTimer);
+    if (progress) { progress.style.width = '0%'; progress.classList.remove('animating'); }
+  }
+
+  /* Arrows */
+  if (prevBtn) prevBtn.addEventListener('click', function() { goTo(current - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function() { goTo(current + 1); });
+
+  /* Dots */
+  dots.forEach(function(dot) {
+    dot.addEventListener('click', function() { goTo(parseInt(dot.dataset.index)); });
+  });
+
+  /* Drag & Swipe */
+  function onDragStart(x) {
+    isDragging = true; startX = x; dragDelta = 0;
+    track.style.transition = 'none';
+    stopAutoplay();
+  }
+  function onDragMove(x) {
+    if (!isDragging) return;
+    dragDelta = x - startX;
+    if (isMobile()) {
+      track.style.transform = 'translateX(' + (getMobileOffset(current) + dragDelta) + 'px)';
+    } else {
+      track.style.transform = 'translateX(calc(' + (-(current * 100)) + '% + ' + dragDelta + 'px))';
+    }
+  }
+  function onDragEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    var threshold = (isMobile() ? slides[0].offsetWidth : wrapper.offsetWidth) * 0.18;
+    if (dragDelta < -threshold) goTo(current + 1);
+    else if (dragDelta > threshold) goTo(current - 1);
+    else goTo(current);
+  }
+
+  wrapper.addEventListener('mousedown', function(e) { onDragStart(e.clientX); });
+  window.addEventListener('mousemove', function(e) { if (isDragging) onDragMove(e.clientX); });
+  window.addEventListener('mouseup', onDragEnd);
+  wrapper.addEventListener('touchstart', function(e) { onDragStart(e.touches[0].clientX); }, { passive: true });
+  wrapper.addEventListener('touchmove',  function(e) { onDragMove(e.touches[0].clientX); },  { passive: true });
+  wrapper.addEventListener('touchend',   onDragEnd);
+
+  /* Keyboard */
+  wrapper.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowLeft')  goTo(current - 1);
+    if (e.key === 'ArrowRight') goTo(current + 1);
+  });
+
+  /* Pause on hover */
+  {% if section.settings.pause_on_hover %}
+  wrapper.addEventListener('mouseenter', stopAutoplay);
+  wrapper.addEventListener('mouseleave', function() { if (AUTOPLAY) startAutoplay(); });
+  {% endif %}
+
+  /* Recalculate on resize */
+  window.addEventListener('resize', function() { applyOffset(current, false); });
+
+  /* Init */
+  goTo(0);
+  if (AUTOPLAY && TOTAL > 1) startAutoplay();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Outfyst Hero Slider",
+  "tag": "section",
+  "class": "outfyst-hero-section",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Global Colors"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text / Button Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / Live Badge Color",
+      "default": "#c0392b"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay Opacity",
+      "default": 75
+    },
+    {
+      "type": "header",
+      "content": "⚙️ Slider Behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 2000,
+      "max": 9000,
+      "step": 500,
+      "unit": "ms",
+      "label": "Autoplay Speed",
+      "default": 5000
+    },
+    {
+      "type": "range",
+      "id": "transition_speed",
+      "min": 400,
+      "max": 1200,
+      "step": 100,
+      "unit": "ms",
+      "label": "Transition Duration",
+      "default": 800
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause Autoplay on Hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show Arrow Buttons (Desktop)",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Desktop Meta Labels"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_meta_label",
+      "label": "Show Top-Right Meta Label",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "meta_vol_label",
+      "label": "Vol. Line",
+      "default": "VOL. I · SS26"
+    },
+    {
+      "type": "text",
+      "id": "meta_shot_label",
+      "label": "Shot Line",
+      "default": "Shot in Bombay · 2026"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_debug_label",
+      "label": "Show Bottom-Left Label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_hint",
+      "label": "Show Scroll Indicator",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "header",
+          "content": "🖼️ Background"
+        },
+        {
+          "type": "image_picker",
+          "id": "slide_image",
+          "label": "Slide Image"
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Overlay Color",
+          "default": "#6b0000"
+        },
+        {
+          "type": "color",
+          "id": "hover_color",
+          "label": "Hover Overlay Color",
+          "default": "#8b2020"
+        },
+        {
+          "type": "header",
+          "content": "📝 Content"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_live_badge",
+          "label": "Show Live Badge",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "live_badge_text",
+          "label": "Live Badge Text",
+          "default": "Live Now"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow Text (Desktop only)",
+          "default": "New Drop / 01 — Live Now"
+        },
+        {
+          "type": "text",
+          "id": "headline",
+          "label": "Headline",
+          "default": "Earn Your Fit."
+        },
+        {
+          "type": "header",
+          "content": "🔘 Primary Button"
+        },
+        {
+          "type": "text",
+          "id": "btn1_label",
+          "label": "Button 1 Label",
+          "default": "Shop Drop 01"
+        },
+        {
+          "type": "url",
+          "id": "btn1_link",
+          "label": "Button 1 Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "btn1_arrow",
+          "label": "Show Arrow on Button 1",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "🔘 Secondary Button"
+        },
+        {
+          "type": "text",
+          "id": "btn2_label",
+          "label": "Button 2 Label",
+          "default": "Watch Film"
+        },
+        {
+          "type": "url",
+          "id": "btn2_link",
+          "label": "Button 2 Link"
+        },
+        {
+          "type": "header",
+          "content": "📱 Mobile Card Label"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_card_label",
+          "label": "Show Label Top-Right (mobile)",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "card_label",
+          "label": "Card Label Text",
+          "default": "SS26"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Outfyst Hero Slider",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "New Drop / 01 — Live Now",
+            "headline": "Earn Your Fit.",
+            "btn1_label": "Shop Drop 01",
+            "btn2_label": "Watch Film",
+            "overlay_color": "#6b0000",
+            "hover_color": "#8b2020",
+            "show_live_badge": true,
+            "live_badge_text": "Live Now",
+            "card_label": "SS26"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "New Drop / 02 — Exclusive",
+            "headline": "Move With Purpose.",
+            "btn1_label": "Explore Now",
+            "btn2_label": "See Lookbook",
+            "overlay_color": "#00294d",
+            "hover_color": "#003d72",
+            "show_live_badge": false,
+            "card_label": "SS26"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

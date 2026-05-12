@@ -1,0 +1,244 @@
+{% comment %}
+  Product Tabs Block - Details & Description (dynamic from product metafields/description),
+  Washcare & Shipping (editable via schema)
+{% endcomment %}
+
+<div class="product-tabs-block" id="product-tabs-{{ block.id }}">
+  <div class="tabs-header">
+    <button
+      class="tab-btn active"
+      data-tab="details"
+      aria-selected="true"
+      role="tab"
+    >
+      Details &amp; Description
+    </button>
+    <button
+      class="tab-btn"
+      data-tab="washcare"
+      aria-selected="false"
+      role="tab"
+    >
+      {{ block.settings.washcare_tab_label | default: 'Washcare' }}
+    </button>
+    <button
+      class="tab-btn"
+      data-tab="shipping"
+      aria-selected="false"
+      role="tab"
+    >
+      {{ block.settings.shipping_tab_label | default: 'Shipping' }}
+    </button>
+  </div>
+
+  <div class="tabs-content">
+
+    {%- comment -%} TAB 1: Details & Description {%- endcomment -%}
+    <div class="tab-panel active" id="tab-details-{{ block.id }}" role="tabpanel">
+
+      {%- if product.metafields.custom.details != blank -%}
+        <div class="tab-section">
+          <ul class="details-list">
+            {%- assign details_lines = product.metafields.custom.details.value | newline_to_br | split: '<br />' -%}
+            {%- for line in details_lines -%}
+              {%- assign trimmed = line | strip -%}
+              {%- if trimmed != blank -%}
+                <li>{{ trimmed }}</li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- if product.description != blank -%}
+        <div class="tab-section">
+          <div class="product-description rte">
+            {{ product.description }}
+          </div>
+        </div>
+      {%- endif -%}
+
+    </div>
+
+    {%- comment -%} TAB 2: Washcare — Checks Metafield first, then Block Settings {%- endcomment -%}
+    <div class="tab-panel" id="tab-washcare-{{ block.id }}" role="tabpanel">
+      {%- assign washcare_meta = product.metafields.custom.product_washcare -%}
+      {%- if washcare_meta != blank or block.settings.washcare_content != blank -%}
+        <div class="tab-section">
+          <div class="rte washcare-content">
+            {%- if washcare_meta != blank -%}
+              {{ washcare_meta | metafield_tag }}
+            {%- else -%}
+              {{ block.settings.washcare_content }}
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} TAB 3: Shipping — Updated with Static Values {%- endcomment -%}
+    <div class="tab-panel" id="tab-shipping-{{ block.id }}" role="tabpanel">
+      <div class="tab-section">
+        <div class="rte shipping-content">
+          <ul>
+            <li>Shipped within 24 hours</li>
+            <li>Free delivery Pan-India</li>
+            <li>Dispatches next day</li>
+          </ul>
+          {%- if block.settings.shipping_content != blank -%}
+            <div style="margin-top: 10px; border-top: 1px solid #eee; pt-10;">
+              {{ block.settings.shipping_content }}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  #product-tabs-{{ block.id }} {
+    border: 1px solid #dbdbdb;
+    border-radius: .9vw;
+    overflow: hidden;
+    background: #f7f7f7;
+    padding: 0 .5vw .5vw;
+  }
+
+  #product-tabs-{{ block.id }} .tabs-header {
+    display: flex;
+    border-bottom: 1px solid #dbdbdb;
+    background: #f7f7f7;
+  }
+
+  #product-tabs-{{ block.id }} .tab-btn {
+    flex: 1;
+    padding: 14px 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #888;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: color 0.2s, border-color 0.2s;
+    text-align: center;
+    position: relative;
+    bottom: -1px;
+  }
+
+  @media(max-width: 768px){
+    #product-tabs-{{ block.id }} .tab-btn{
+     padding: 11px 7px;
+     font-size: 10.5px;
+    }
+  }
+
+  #product-tabs-{{ block.id }} .tab-btn:hover {
+    color: #111;
+  }
+
+  #product-tabs-{{ block.id }} .tab-btn.active {
+    color: #111;
+    border-bottom: 2px solid #111;
+    font-weight: 600;
+  }
+
+  #product-tabs-{{ block.id }} .tabs-content {
+    padding: 10px 4px 4px;
+  }
+
+  #product-tabs-{{ block.id }} .tab-panel {
+    display: none;
+  }
+
+  #product-tabs-{{ block.id }} .tab-panel.active {
+    display: block;
+  }
+
+  #product-tabs-{{ block.id }} .tab-section {
+    margin-bottom: 16px;
+  }
+
+  #product-tabs-{{ block.id }} .tab-section:last-child {
+    margin-bottom: 0;
+  }
+
+  #product-tabs-{{ block.id }} .section-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 8px 0;
+  }
+
+  #product-tabs-{{ block.id }} .details-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0 6px;
+  }
+
+  #product-tabs-{{ block.id }} .details-list li {
+    font-size: 13.5px;
+    color: #444;
+    padding: 2px 0;
+    line-height: 1.6;
+  }
+
+  #product-tabs-{{ block.id }} .product-description p,
+  #product-tabs-{{ block.id }} .washcare-content p,
+  #product-tabs-{{ block.id }} .shipping-content p {
+    font-size: 13.5px;
+    color: #444;
+    line-height: 1.7;
+    margin: 0 0 10px 0;
+  }
+
+  #product-tabs-{{ block.id }} .product-description p:last-child,
+  #product-tabs-{{ block.id }} .washcare-content p:last-child,
+  #product-tabs-{{ block.id }} .shipping-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  #product-tabs-{{ block.id }} .tab-empty p {
+    font-size: 13.5px;
+    color: #aaa;
+    margin: 0;
+  }
+</style>
+
+<script>
+  (function () {
+    var container = document.getElementById('product-tabs-{{ block.id }}');
+    if (!container) return;
+
+    var buttons = container.querySelectorAll('.tab-btn');
+    var panels  = container.querySelectorAll('.tab-panel');
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = btn.getAttribute('data-tab');
+
+        buttons.forEach(function (b) {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+
+        // FIX: only remove .active class — do NOT touch .hidden
+        panels.forEach(function (p) {
+          p.classList.remove('active');
+        });
+
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+
+        var activePanel = container.querySelector('#tab-' + target + '-{{ block.id }}');
+        if (activePanel) {
+          activePanel.classList.add('active');
+          // FIX: do NOT set activePanel.hidden = false
+        }
+      });
+    });
+  })();
+</script>

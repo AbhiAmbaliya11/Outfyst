@@ -1,0 +1,305 @@
+<section
+  class="early-access-section"
+  style="
+    background: {{ section.settings.bg_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="early-access-wrapper">
+    
+    {% if section.settings.small_text != blank %}
+      <div
+        class="early-access-small"
+        style="color: {{ section.settings.small_text_color }};"
+      >
+        {{ section.settings.small_text }}
+      </div>
+    {% endif %}
+
+    <h2
+      class="early-access-heading"
+      style="color: {{ section.settings.heading_color }};"
+    >
+      {{ section.settings.heading }}
+      <span style="color: {{ section.settings.highlight_color }};">
+        {{ section.settings.highlight_text }}
+      </span>
+      <br>
+      <span style="color: {{ section.settings.second_line_color }};">
+        {{ section.settings.second_line }}
+      </span>
+    </h2>
+
+    {% form 'contact', class: 'early-access-form' %}
+      <input type="hidden" name="contact[tags]" value="Early Access">
+
+      <input
+        type="email"
+        name="contact[email]"
+        placeholder="{{ section.settings.placeholder }}"
+        required
+        class="early-access-input"
+      >
+
+      <button
+        type="submit"
+        class="early-access-button"
+        style="
+          background: {{ section.settings.button_bg }};
+          color: {{ section.settings.button_color }};
+        "
+      >
+        {{ section.settings.button_text }}
+      </button>
+
+      {% if form.posted_successfully? %}
+        <p class="early-access-success">{{ section.settings.success_text }}</p>
+      {% endif %}
+
+      {% if form.errors %}
+        <p class="early-access-error">Please enter a valid email address.</p>
+      {% endif %}
+    {% endform %}
+
+  </div>
+</section>
+
+<style>
+.early-access-section {
+  width: 100%;
+}
+
+.early-access-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.early-access-small {
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.early-access-heading {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 64px;
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  margin: 0px auto 28px;
+  max-width: 900px;
+}
+
+.early-access-form {
+  width: 100%;
+  max-width: 590px;
+  height: 64px;
+  border: 1.5px solid #000;
+  border-radius: 999px;
+  margin: 0px auto 0;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  background: #ffff;
+  position: relative;
+}
+
+.early-access-input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0 24px;
+  font-size: 16px;
+  color: #000;
+}
+
+.early-access-input:focus-visible{
+  box-shadow: none !important;
+}
+
+.early-access-input::placeholder {
+  color: #888;
+}
+
+.early-access-button {
+  height: 52px;
+  min-width: 115px;
+  border: none;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.early-access-success,
+.early-access-error {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -38px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.early-access-success {
+  color: green;
+}
+
+.early-access-error {
+  color: red;
+}
+
+@media screen and (max-width: 768px) {
+  .early-access-heading {
+    font-size: 42px;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .early-access-small {
+    letter-spacing: 5px;
+    font-size: 11px;
+  }
+
+  .early-access-form {
+    height: 58px;
+    max-width: 100%;
+  }
+
+  .early-access-button {
+    height: 48px;
+    min-width: 95px;
+    font-size: 11px;
+    letter-spacing: 2px;
+  }
+
+  .early-access-input {
+    padding: 0 18px;
+    font-size: 14px;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Sign up Form",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#e9e5dc"
+    },
+    {
+      "type": "text",
+      "id": "small_text",
+      "label": "Small Text",
+      "default": "EARLY ACCESS"
+    },
+    {
+      "type": "color",
+      "id": "small_text_color",
+      "label": "Small Text Color",
+      "default": "#666666"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading Text",
+      "default": "GET THE NEXT DROP"
+    },
+    {
+      "type": "text",
+      "id": "highlight_text",
+      "label": "Highlight Text",
+      "default": "24"
+    },
+    {
+      "type": "text",
+      "id": "second_line",
+      "label": "Second Line Text",
+      "default": "HOURS EARLY."
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color",
+      "label": "Highlight Color",
+      "default": "#9b101d"
+    },
+    {
+      "type": "color",
+      "id": "second_line_color",
+      "label": "Second Line Color",
+      "default": "#9b101d"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Email Placeholder",
+      "default": "your@email.com"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "JOIN →"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "success_text",
+      "label": "Success Message",
+      "default": "Thank you! You are now on the early access list."
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 40,
+      "max": 200,
+      "step": 5,
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 40,
+      "max": 200,
+      "step": 5,
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sign up Form"
+    }
+  ]
+}
+{% endschema %}

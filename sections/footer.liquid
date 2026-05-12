@@ -1,0 +1,328 @@
+{% comment %}theme-check-disable UndefinedObject{% endcomment %}
+
+<style>
+  .custom-dark-footer {
+    background: rgb(11, 11, 11);
+    color: rgb(245, 242, 236);
+    padding: 80px 32px 40px;
+  }
+
+  .custom-dark-footer__inner {
+    max-width: 1600px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.45fr repeat(4, 1fr);
+    gap: 80px;
+  }
+
+  .custom-dark-footer__logo {
+    font-size: 55px;
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    color: {{ section.settings.logo_color }};
+    margin: 0 0 10px;
+  }
+
+  .custom-dark-footer__tagline {
+    color: {{ section.settings.accent_color }};
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 38px;
+  }
+
+  .custom-dark-footer__desc {
+    font-family: Manrope, sans-serif;
+    font-size: 13px;
+    color: rgba(245, 242, 236, 0.6);
+    margin-top: 32px;
+    line-height: 1.6;
+    max-width: 280px;
+  }
+
+  .custom-dark-footer__heading {
+    color: #f5f2ec66;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+    opacity: .65;
+  }
+
+  .custom-dark-footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .custom-dark-footer li {
+    margin-bottom: 2px;
+  }
+
+  .custom-dark-footer a {
+    color: #f5f2ecd9;
+    font-size: 16px;
+    text-decoration: none;
+  }
+
+  .custom-dark-footer__bottom {
+    max-width: 1600px;
+    margin: 45px auto 0;
+    padding-top: 28px;
+    border-top: 1px solid {{ section.settings.border_color }};
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .custom-dark-footer__copy,
+  .custom-dark-footer__policies a {
+    color: rgba(245, 242, 236, 0.4);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .custom-dark-footer__policies {
+    display: flex;
+    gap: 3px;
+  }
+
+  .custom-dark-footer__policies span{
+    font-size: 9px;
+  }
+
+  @media(max-width: 989px) {
+    .custom-dark-footer {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .custom-dark-footer__inner {
+      grid-template-columns: 1fr 1fr;
+      gap: 45px 30px;
+    }
+
+    .custom-dark-footer__brand {
+      grid-column: 1 / -1;
+    }
+
+    .custom-dark-footer__bottom {
+      flex-direction: column;
+    }
+  }
+
+  @media(max-width: 575px) {
+    .custom-dark-footer__inner {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .custom-dark-footer__logo {
+      font-size: 56px;
+      letter-spacing: -3px;
+    }
+  }
+</style>
+
+<footer class="custom-dark-footer">
+  <div class="custom-dark-footer__inner">
+
+    <div class="custom-dark-footer__brand">
+      <h2 class="custom-dark-footer__logo">{{ section.settings.logo_text }}</h2>
+      <div class="custom-dark-footer__tagline">{{ section.settings.tagline }}</div>
+      <div class="custom-dark-footer__desc">{{ section.settings.description }}</div>
+    </div>
+
+    {% for block in section.blocks %}
+      {% if block.type == 'link_list' %}
+        <div class="custom-dark-footer__menu" {{ block.shopify_attributes }}>
+          {% if block.settings.heading != blank %}
+            <h3 class="custom-dark-footer__heading">{{ block.settings.heading }}</h3>
+          {% endif %}
+
+          {% if block.settings.menu != blank %}
+            <ul>
+              {% for link in block.settings.menu.links %}
+                <li>
+                  <a href="{{ link.url }}">{{ link.title }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+
+  </div>
+
+  <div class="custom-dark-footer__bottom">
+    <div class="custom-dark-footer__copy">
+      © {{ 'now' | date: '%Y' }} {{ shop.name | upcase }} • {{ section.settings.bottom_text }}
+    </div>
+
+    <div class="custom-dark-footer__policies">
+      {% if section.settings.terms_link != blank %}
+        <a href="{{ section.settings.terms_link }}">Terms</a><span>•</span>
+      {% endif %}
+      {% if section.settings.privacy_link != blank %}
+        <a href="{{ section.settings.privacy_link }}">Privacy</a><span>•</span>
+      {% endif %}
+      {% if section.settings.cookies_link != blank %}
+        <a href="{{ section.settings.cookies_link }}">Cookies</a>
+      {% endif %}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Custom Dark Footer",
+  "settings": [
+    {
+      "type": "color",
+      "id": "footer_bg",
+      "label": "Footer background",
+      "default": "#080808"
+    },
+    {
+      "type": "color",
+      "id": "logo_color",
+      "label": "Logo color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Tagline color",
+      "default": "#b90018"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#777777"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Link color",
+      "default": "#d7d7d7"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Description color",
+      "default": "#8d8d8d"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#2a2a2a"
+    },
+    {
+      "type": "color",
+      "id": "bottom_text_color",
+      "label": "Bottom text color",
+      "default": "#666666"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo text",
+      "default": "OUTFYST"
+    },
+    {
+      "type": "range",
+      "id": "logo_size",
+      "label": "Logo size",
+      "min": 40,
+      "max": 110,
+      "step": 2,
+      "default": 70
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "EARN YOUR FIT"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Two drops a year. No restocks. Made for those who do the work."
+    },
+    {
+      "type": "text",
+      "id": "bottom_text",
+      "label": "Bottom text",
+      "default": "EARN YOUR FIT"
+    },
+    {
+      "type": "url",
+      "id": "terms_link",
+      "label": "Terms link"
+    },
+    {
+      "type": "url",
+      "id": "privacy_link",
+      "label": "Privacy link"
+    },
+    {
+      "type": "url",
+      "id": "cookies_link",
+      "label": "Cookies link"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 40,
+      "max": 140,
+      "step": 4,
+      "default": 84
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link_list",
+      "name": "Footer menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "CONNECT"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Dark Footer"
+    }
+  ]
+}
+{% endschema %}

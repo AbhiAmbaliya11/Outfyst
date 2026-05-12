@@ -1,0 +1,721 @@
+{% comment %}
+  Section: Built Not Given – Story
+  — Cream outer background with dark inner card (boxed layout)
+  — Fully editable via schema
+  — Responsive, animated, production-grade
+{% endcomment %}
+
+<style>
+  /* ── OUTER WRAPPER (cream background) ── */
+  .bng-outer {
+    background-color: {{ section.settings.outer_bg_color }};
+    padding: {{ section.settings.outer_padding_vertical }}px {{ section.settings.outer_padding_horizontal }}px;
+  }
+
+  /* ── INNER CARD (dark box) ── */
+  .bng-card {
+    background-color: {{ section.settings.card_bg_color }};
+    border-radius: {{ section.settings.card_border_radius }}px;
+    max-width: {{ section.settings.card_max_width }}px;
+    margin: 10px auto 0px;
+    padding: {{ section.settings.card_padding_vertical }}px {{ section.settings.card_padding_horizontal }}px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 48px;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  /* ── LEFT COLUMN ── */
+  .bng-left {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Eyebrow */
+  .bng-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(245, 242, 236, 0.85);
+    font-size: {{ section.settings.eyebrow_font_size }}px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .bng-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 22px;
+    height: 1px;
+    background: {{ section.settings.eyebrow_color }};
+    flex-shrink: 0;
+  }
+
+  /* Headline */
+  .bng-headline {
+    color: {{ section.settings.headline_color }};
+    font-size: {{ section.settings.headline_font_size }}px;
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  /* Body */
+  .bng-body {
+    color: {{ section.settings.body_color }};
+    font-size: {{ section.settings.body_font_size }}px;
+    line-height: 1.6;
+    font-weight: 500;
+    max-width: 517px;
+    margin: 0;
+  }
+
+  /* ── JOURNEY TRAIL ── */
+  .bng-trail {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0;
+    margin-top: 4px;
+  }
+
+  .bng-trail-item {
+    color: rgba(245, 242, 236, 0.85);
+    font-size: {{ section.settings.trail_font_size }}px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .bng-trail-item.is-active {
+    color: {{ section.settings.trail_active_color }};
+  }
+
+  .bng-trail-sep {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 15px;
+    flex-shrink: 0;
+  }
+
+  .bng-trail-sep svg {
+    width: 28px;
+    height: 10px;
+    overflow: visible;
+  }
+
+  .bng-trail-sep line,
+  .bng-trail-sep polyline {
+    stroke: {{ section.settings.trail_color }};
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── RIGHT COLUMN ── */
+  .bng-right {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ── BUTTONS ── */
+  .bng-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    padding: {{ section.settings.button_padding_vertical }}px {{ section.settings.button_padding_horizontal }}px;
+    font-size: {{ section.settings.button_font_size }}px;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1.5px solid;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.28s ease, color 0.28s ease, border-color 0.28s ease;
+    height: 52px;
+  }
+
+  /* Primary – white filled */
+  .bng-btn--primary {
+    background-color: {{ section.settings.primary_btn_bg }};
+    color: {{ section.settings.primary_btn_text }};
+    border-color: {{ section.settings.primary_btn_bg }};
+  }
+
+  .bng-btn--primary:hover {
+    background-color: {{ section.settings.primary_btn_hover_bg }};
+    color: {{ section.settings.primary_btn_hover_text }};
+    border-color: {{ section.settings.primary_btn_hover_bg }};
+  }
+
+  /* Secondary – outlined */
+  .bng-btn--secondary {
+    background-color: transparent;
+    color: {{ section.settings.secondary_btn_text }};
+    border-color: {{ section.settings.secondary_btn_border }};
+  }
+
+  .bng-btn--secondary:hover {
+    background-color: {{ section.settings.secondary_btn_hover_bg }};
+    color: {{ section.settings.secondary_btn_hover_text }};
+    border-color: {{ section.settings.secondary_btn_hover_bg }};
+  }
+
+  /* ── ARROW ANIMATION ── */
+  .bng-btn-arrow {
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    flex-shrink: 0;
+  }
+
+  .bng-btn:hover .bng-btn-arrow {
+    transform: translateX(5px);
+  }
+
+  .bng-btn-arrow svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .bng-card {
+      gap: 36px;
+      padding: {{ section.settings.card_padding_vertical | times: 0.85 | round }}px {{ section.settings.card_padding_horizontal | times: 0.85 | round }}px;
+    }
+    .bng-headline {
+      font-size: {{ section.settings.headline_font_size | times: 0.82 | round }}px;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .bng-outer {
+      padding: {{ section.settings.outer_padding_vertical | times: 0.75 | round }}px {{ section.settings.outer_padding_horizontal | times: 0.6 | round }}px;
+    }
+    .bng-card {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding: {{ section.settings.card_padding_vertical | times: 0.8 | round }}px {{ section.settings.card_padding_horizontal | times: 0.75 | round }}px;
+    }
+    .bng-headline {
+      font-size: {{ section.settings.headline_font_size | times: 0.7 | round }}px;
+    }
+    .bng-body {
+      max-width: 100%;
+    }
+    .bng-trail {
+      flex-wrap: wrap;
+      gap: 6px 0;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .bng-outer {
+      padding: {{ section.settings.outer_padding_vertical | times: 0.5 | round }}px {{ section.settings.outer_padding_horizontal | times: 0.4 | round }}px;
+    }
+    .bng-card {
+      padding: {{ section.settings.card_padding_vertical | times: 0.65 | round }}px {{ section.settings.card_padding_horizontal | times: 0.6 | round }}px;
+      border-radius: {{ section.settings.card_border_radius | times: 0.6 | round }}px;
+    }
+    .bng-headline {
+      font-size: {{ section.settings.headline_font_size | times: 0.55 | round }}px;
+    }
+    .bng-btn {
+      padding: 15px 20px;
+      font-size: {{ section.settings.button_font_size | minus: 1 }}px;
+    }
+  }
+</style>
+
+<!-- OUTER CREAM WRAPPER -->
+<div class="bng-outer" id="bng-{{ section.id }}">
+
+  <!-- INNER DARK CARD -->
+  <div class="bng-card">
+
+    <!-- LEFT COLUMN -->
+    <div class="bng-left">
+
+      {% if section.settings.eyebrow != blank %}
+        <div class="bng-eyebrow">{{ section.settings.eyebrow }}</div>
+      {% endif %}
+
+      {% if section.settings.headline != blank %}
+        <{{ section.settings.headline_tag }} class="bng-headline">
+          {{ section.settings.headline }}
+        </{{ section.settings.headline_tag }}>
+      {% endif %}
+
+      {% if section.settings.body_text != blank %}
+        <p class="bng-body">{{ section.settings.body_text }}</p>
+      {% endif %}
+
+      <!-- JOURNEY TRAIL -->
+      {% if section.settings.show_trail %}
+        <div class="bng-trail" role="list" aria-label="Journey stages">
+
+          {% if section.settings.trail_step_1 != blank %}
+            <span class="bng-trail-item {% if section.settings.trail_active_index == '1' %}is-active{% endif %}" role="listitem">
+              {{ section.settings.trail_step_1 }}
+            </span>
+          {% endif %}
+
+          {% if section.settings.trail_step_2 != blank %}
+            <span class="bng-trail-sep" aria-hidden="true">
+              <span style="color: rgba(245, 242, 236, 0.3);">→</span>
+            </span>
+            <span class="bng-trail-item {% if section.settings.trail_active_index == '2' %}is-active{% endif %}" role="listitem">
+              {{ section.settings.trail_step_2 }}
+            </span>
+          {% endif %}
+
+          {% if section.settings.trail_step_3 != blank %}
+            <span class="bng-trail-sep" aria-hidden="true">
+              <span style="color: rgba(245, 242, 236, 0.3);">→</span>
+            </span>
+            <span class="bng-trail-item {% if section.settings.trail_active_index == '3' %}is-active{% endif %}" role="listitem">
+              {{ section.settings.trail_step_3 }}
+            </span>
+          {% endif %}
+
+          {% if section.settings.trail_step_4 != blank %}
+            <span class="bng-trail-sep" aria-hidden="true">
+              <span style="color: rgba(245, 242, 236, 0.3);">→</span>
+            </span>
+            <span class="bng-trail-item {% if section.settings.trail_active_index == '4' %}is-active{% endif %}" role="listitem">
+              {{ section.settings.trail_step_4 }}
+            </span>
+          {% endif %}
+
+        </div>
+      {% endif %}
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="bng-right">
+
+      {% if section.settings.primary_btn_label != blank %}
+        <a
+          href="{{ section.settings.primary_btn_link }}"
+          class="bng-btn bng-btn--primary"
+          {% if section.settings.primary_btn_new_tab %}target="_blank" rel="noopener"{% endif %}
+          aria-label="{{ section.settings.primary_btn_label }}"
+        >
+          {{ section.settings.primary_btn_label }}
+          <span class="bng-btn-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </span>
+        </a>
+      {% endif %}
+
+      {% if section.settings.secondary_btn_label != blank %}
+        <a
+          href="{{ section.settings.secondary_btn_link }}"
+          class="bng-btn bng-btn--secondary"
+          {% if section.settings.secondary_btn_new_tab %}target="_blank" rel="noopener"{% endif %}
+          aria-label="{{ section.settings.secondary_btn_label }}"
+        >
+          {{ section.settings.secondary_btn_label }}
+        </a>
+      {% endif %}
+
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Built Not Given – Story",
+  "tag": "section",
+  "class": "bng-story-section",
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "🌿 Outer Background (Cream)"
+    },
+    {
+      "type": "color",
+      "id": "outer_bg_color",
+      "label": "Outer Background Color",
+      "default": "#edeae4"
+    },
+    {
+      "type": "range",
+      "id": "outer_padding_vertical",
+      "label": "Outer Vertical Padding (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "outer_padding_horizontal",
+      "label": "Outer Horizontal Padding (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 48
+    },
+
+    {
+      "type": "header",
+      "content": "⬛ Inner Card (Dark Box)"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card Background Color",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "card_max_width",
+      "label": "Card Max Width (px)",
+      "min": 800,
+      "max": 1600,
+      "step": 20,
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "Card Border Radius (px)",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "card_padding_vertical",
+      "label": "Card Inner Vertical Padding (px)",
+      "min": 24,
+      "max": 120,
+      "step": 4,
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "card_padding_horizontal",
+      "label": "Card Inner Horizontal Padding (px)",
+      "min": 24,
+      "max": 120,
+      "step": 4,
+      "default": 64
+    },
+
+    {
+      "type": "header",
+      "content": "✏️ Eyebrow Label"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "THE STORY"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow Color",
+      "default": "#aaaaaa"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_font_size",
+      "label": "Eyebrow Font Size (px)",
+      "min": 9,
+      "max": 18,
+      "step": 1,
+      "default": 11
+    },
+
+    {
+      "type": "header",
+      "content": "🔤 Headline"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline Text",
+      "default": "BUILT. NOT GIVEN."
+    },
+    {
+      "type": "select",
+      "id": "headline_tag",
+      "label": "Headline HTML Tag",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "color",
+      "id": "headline_color",
+      "label": "Headline Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "headline_font_size",
+      "label": "Headline Font Size (px – desktop)",
+      "min": 32,
+      "max": 120,
+      "step": 2,
+      "default": 68
+    },
+
+    {
+      "type": "header",
+      "content": "📝 Body Text"
+    },
+    {
+      "type": "textarea",
+      "id": "body_text",
+      "label": "Body Text",
+      "default": "OUTFYST is for the people in the middle of their story. Not arrived. Not waiting. Working."
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body Text Color",
+      "default": "#aaaaaa"
+    },
+    {
+      "type": "range",
+      "id": "body_font_size",
+      "label": "Body Font Size (px)",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "default": 14
+    },
+
+    {
+      "type": "header",
+      "content": "➡️ Journey Trail"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trail",
+      "label": "Show Journey Trail",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "trail_step_1",
+      "label": "Trail Step 1",
+      "default": "FROM NOTHING"
+    },
+    {
+      "type": "text",
+      "id": "trail_step_2",
+      "label": "Trail Step 2",
+      "default": "DISCIPLINE"
+    },
+    {
+      "type": "text",
+      "id": "trail_step_3",
+      "label": "Trail Step 3",
+      "default": "GROWTH"
+    },
+    {
+      "type": "text",
+      "id": "trail_step_4",
+      "label": "Trail Step 4",
+      "default": "STATUS"
+    },
+    {
+      "type": "select",
+      "id": "trail_active_index",
+      "label": "Active Trail Step (highlighted)",
+      "options": [
+        { "value": "1", "label": "Step 1" },
+        { "value": "2", "label": "Step 2" },
+        { "value": "3", "label": "Step 3" },
+        { "value": "4", "label": "Step 4" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "color",
+      "id": "trail_color",
+      "label": "Trail Default Color",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "trail_active_color",
+      "label": "Trail Active (Highlight) Color",
+      "default": "#c0392b"
+    },
+    {
+      "type": "range",
+      "id": "trail_font_size",
+      "label": "Trail Font Size (px)",
+      "min": 9,
+      "max": 16,
+      "step": 1,
+      "default": 11
+    },
+
+    {
+      "type": "header",
+      "content": "🔘 Primary Button"
+    },
+    {
+      "type": "text",
+      "id": "primary_btn_label",
+      "label": "Primary Button Label",
+      "default": "READ THE FULL STORY"
+    },
+    {
+      "type": "url",
+      "id": "primary_btn_link",
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "primary_btn_new_tab",
+      "label": "Open in new tab",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "primary_btn_bg",
+      "label": "Primary Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "primary_btn_text",
+      "label": "Primary Button Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "primary_btn_hover_bg",
+      "label": "Primary Button Hover Background",
+      "default": "#e2e2e2"
+    },
+    {
+      "type": "color",
+      "id": "primary_btn_hover_text",
+      "label": "Primary Button Hover Text",
+      "default": "#111111"
+    },
+
+    {
+      "type": "header",
+      "content": "🔲 Secondary Button"
+    },
+    {
+      "type": "text",
+      "id": "secondary_btn_label",
+      "label": "Secondary Button Label",
+      "default": "SHOP DROP 01"
+    },
+    {
+      "type": "url",
+      "id": "secondary_btn_link",
+      "label": "Secondary Button Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "secondary_btn_new_tab",
+      "label": "Open in new tab",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "secondary_btn_text",
+      "label": "Secondary Button Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "secondary_btn_border",
+      "label": "Secondary Button Border Color",
+      "default": "#444444"
+    },
+    {
+      "type": "color",
+      "id": "secondary_btn_hover_bg",
+      "label": "Secondary Button Hover Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "secondary_btn_hover_text",
+      "label": "Secondary Button Hover Text",
+      "default": "#111111"
+    },
+
+    {
+      "type": "header",
+      "content": "🔡 Button Sizing"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Button Font Size (px)",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_padding_vertical",
+      "label": "Button Vertical Padding (px)",
+      "min": 12,
+      "max": 40,
+      "step": 2,
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "button_padding_horizontal",
+      "label": "Button Horizontal Padding (px)",
+      "min": 16,
+      "max": 60,
+      "step": 2,
+      "default": 32
+    }
+
+  ],
+  "presets": [
+    {
+      "name": "Built Not Given – Story"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,825 @@
+{% comment %}
+  Section: Narrative Arc
+  "The Narrative At The Core" - 4-stage grid section
+{% endcomment %}
+
+<section
+  id="NarrativeArc-{{ section.id }}"
+  class="narrative-arc section-{{ section.id }}-padding"
+  style="
+    background-color: {{ section.settings.bg_color }};
+    padding-top: {{ section.settings.section_padding_top }}px;
+    padding-bottom: {{ section.settings.section_padding_bottom }}px;
+    display: block;
+    position: relative;
+    z-index: 1;
+  "
+>
+  <div class="narrative-arc__inner" style="max-width: {{ section.settings.container_width }}px; margin: 0 auto; padding: 0 {{ section.settings.container_padding }}px;">
+
+    {% comment %} Header {% endcomment %}
+    <div class="narrative-arc__header" style="margin-bottom: {{ section.settings.header_bottom_spacing }}px;">
+
+      {% if section.settings.eyebrow != blank %}
+        <p
+          class="narrative-arc__eyebrow"
+          style="
+            color: {{ section.settings.eyebrow_color }};
+            font-size: {{ section.settings.eyebrow_font_size }}px;
+            letter-spacing: {{ section.settings.eyebrow_letter_spacing | divided_by: 10.0 }}em;
+            font-weight: {{ section.settings.eyebrow_font_weight }};
+            margin-bottom: {{ section.settings.eyebrow_bottom_spacing }}px;
+          "
+        >
+          &mdash;&nbsp;{{ section.settings.eyebrow }}
+        </p>
+      {% endif %}
+
+      {% if section.settings.heading != blank %}
+        <{{ section.settings.heading_tag }}
+          class="narrative-arc__heading"
+          style="
+            color: {{ section.settings.heading_color }};
+            font-size: clamp({{ section.settings.heading_font_size_min }}px, {{ section.settings.heading_font_size_vw }}vw, {{ section.settings.heading_font_size }}px);
+            font-weight: {{ section.settings.heading_font_weight }};
+            letter-spacing: {{ section.settings.heading_letter_spacing | divided_by: 100.0 }}em;
+            line-height: {{ section.settings.heading_line_height | divided_by: 10.0 }};
+            text-transform: {{ section.settings.heading_text_transform }};
+            margin: 0;
+          "
+        >
+          {{ section.settings.heading }}
+        </{{ section.settings.heading_tag }}>
+      {% endif %}
+
+    </div>
+
+    {% comment %} Stages Grid {% endcomment %}
+    <div
+      class="narrative-arc__grid"
+      style="grid-template-columns: repeat({{ section.blocks.size }}, 1fr);"
+    >
+      {% for block in section.blocks %}
+        {% if block.type == 'stage' %}
+          <div
+            class="narrative-arc__stage"
+            style="
+             border-left:
+{% if forloop.first %}
+  none
+{% else %}
+  {{ section.settings.divider_thickness }}px solid rgb(
+    {{ section.settings.divider_color.red }}
+    {{ section.settings.divider_color.green }}
+    {{ section.settings.divider_color.blue }}
+    / {{ section.settings.divider_opacity }}%
+  )
+{% endif %};
+              padding: {{ section.settings.stage_padding_vertical }}px {{ section.settings.stage_padding_horizontal }}px {{ section.settings.stage_padding_vertical }}px 0;
+            "
+            {{ block.shopify_attributes }}
+          >
+
+            {% if block.settings.stage_label != blank %}
+              <p
+                class="narrative-arc__stage-label"
+                style="
+                  color: {{ block.settings.stage_label_color }};
+                  font-size: {{ block.settings.stage_label_font_size }}px;
+                  letter-spacing: {{ block.settings.stage_label_letter_spacing | divided_by: 100.0 }}em;
+                  font-weight: {{ block.settings.stage_label_font_weight }};
+                  margin-bottom: {{ section.settings.stage_label_bottom_spacing }}px;
+                "
+              >
+                {{ block.settings.stage_label }}
+              </p>
+            {% endif %}
+
+            {% if block.settings.stage_title != blank %}
+              <h3
+                class="narrative-arc__stage-title"
+                style="
+                  color: {{ block.settings.stage_title_color }};
+                  font-size: {{ block.settings.stage_title_font_size }}px;
+                  font-weight: {{ block.settings.stage_title_font_weight }};
+                  letter-spacing: {{ block.settings.stage_title_letter_spacing | divided_by: 100.0 }}em;
+                  text-transform: {{ block.settings.stage_title_text_transform }};
+                  margin-bottom: {{ section.settings.stage_title_bottom_spacing }}px;
+                  line-height: 1.1;
+                "
+              >
+                {{ block.settings.stage_title }}
+              </h3>
+            {% endif %}
+
+            {% if block.settings.stage_description != blank %}
+              <p
+                class="narrative-arc__stage-description"
+                style="
+                  color: {{ block.settings.stage_description_color }};
+                  font-size: {{ block.settings.stage_description_font_size }}px;
+                  font-weight: {{ block.settings.stage_description_font_weight }};
+                  line-height: {{ block.settings.stage_description_line_height | divided_by: 10.0 }};
+                  margin: 0;
+                "
+              >
+                {{ block.settings.stage_description }}
+              </p>
+            {% endif %}
+
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% assign border_opacity = section.settings.border_top_opacity | times: 0.01 %}
+{% assign border_color = section.settings.border_top_color | color_modify: 'alpha', border_opacity %}
+
+<style>
+  .narrative-arc {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .narrative-arc__inner {
+    box-sizing: border-box;
+    width: 100%;
+  }
+  .narrative-arc__eyebrow {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .narrative-arc__grid {
+    display: grid !important;
+    width: 100%;
+  
+  }
+
+  #NarrativeArc-{{ section.id }} .narrative-arc__grid {
+  border-top: 0.5px solid {{ border_color }} !important;
+}
+  .narrative-arc__stage {
+    box-sizing: border-box;
+  }
+  .narrative-arc__stage-label {
+    margin: 0;
+    text-transform: uppercase;
+  }
+  .narrative-arc__stage-title {
+    margin: 0;
+  }
+  .narrative-arc__stage-description {
+    margin: 0;
+  }
+
+  /* ─── TABLET / LAPTOP (≤1024px) — 2 column grid ─── */
+  @media screen and (max-width: 1024px) {
+    .narrative-arc__grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .narrative-arc__header {
+      margin-bottom: 28px !important;
+    }
+    .narrative-arc__eyebrow {
+      font-size: 10px !important;
+      margin-bottom: 8px !important;
+    }
+    .narrative-arc__heading {
+      font-size: clamp(22px, 3.2vw, 42px) !important;
+      line-height: 1.05 !important;
+    }
+    .narrative-arc__stage {
+      padding-right: 16px !important;
+      padding-top: 20px !important;
+      padding-bottom: 20px !important;
+      border-left: none !important;
+      border-top: 1px solid rgba(245, 242, 236, 0.15) !important;
+    }
+    /* Right column gets left border */
+    .narrative-arc__stage:nth-child(even) {
+      border-left: 1px solid rgba(248, 56, 8, 0.60) !important;
+      padding-left: 16px !important;
+    }
+    /* Top row — no top border */
+    .narrative-arc__stage:nth-child(1),
+    .narrative-arc__stage:nth-child(2) {
+      border-top: none !important;
+    }
+    .narrative-arc__stage-label {
+      font-size: 9px !important;
+      margin-bottom: 8px !important;
+    }
+    .narrative-arc__stage-title {
+      font-size: 18px !important;
+      margin-bottom: 8px !important;
+      line-height: 1.1 !important;
+    }
+    .narrative-arc__stage-description {
+      font-size: 12px !important;
+      line-height: 1.5 !important;
+    }
+  }
+
+  /* ─── MOBILE (≤600px) — 2 column grid ─── */
+  @media screen and (max-width: 600px) {
+    .narrative-arc__inner {
+      padding: 0 16px !important;
+    }
+    .narrative-arc__grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .narrative-arc__header {
+      margin-bottom: 20px !important;
+    }
+    .narrative-arc__eyebrow {
+      font-size: 8px !important;
+      margin-bottom: 6px !important;
+      letter-spacing: 0.12em !important;
+    }
+    .narrative-arc__heading {
+      font-size: clamp(18px, 5vw, 28px) !important;
+      line-height: 1.05 !important;
+      letter-spacing: -0.01em !important;
+    }
+    .narrative-arc__stage {
+      padding: 14px 10px 14px 0 !important;
+      border-left: none !important;
+      border-top: 1px solid rgba(245, 242, 236, 0.15) !important;
+    }
+    /* Right column gets left border */
+    .narrative-arc__stage:nth-child(even) {
+      border-left: 1px solid rgba(219, 34, 9, 0.60) !important;
+      padding-left: 10px !important;
+    }
+    /* Top row — no top border */
+    .narrative-arc__stage:nth-child(1),
+    .narrative-arc__stage:nth-child(2) {
+      border-top: none !important;
+    }
+    .narrative-arc__stage-label {
+      font-size: 10px !important;
+      margin-bottom: 5px !important;
+      letter-spacing: 0.08em !important;
+    }
+    .narrative-arc__stage-title {
+      font-size: 16px !important;
+      margin-bottom: 6px !important;
+      line-height: 1.1 !important;
+    }
+    .narrative-arc__stage-description {
+      font-size: 12px !important;
+      line-height: 1.45 !important;
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+  #NarrativeArc-{{ section.id }} {
+    padding-top: {{ section.settings.section_padding_top_tablet }}px !important;
+    padding-bottom: {{ section.settings.section_padding_bottom_tablet }}px !important;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  #NarrativeArc-{{ section.id }} {
+    padding-top: {{ section.settings.section_padding_top_mobile }}px !important;
+    padding-bottom: {{ section.settings.section_padding_bottom_mobile }}px !important;
+  }
+}
+
+  @media screen and (max-width: 1024px) {
+    #NarrativeArc-{{ section.id }} .narrative-arc__stage {
+      border-top: 1px solid {{ border_color }} !important;
+    }
+    #NarrativeArc-{{ section.id }} .narrative-arc__stage:nth-child(even) {
+      border-left: 1px solid {{ border_color }} !important;
+    }
+    /* Top row — no border */
+    #NarrativeArc-{{ section.id }} .narrative-arc__stage:nth-child(1),
+    #NarrativeArc-{{ section.id }} .narrative-arc__stage:nth-child(2) {
+      border-top: none !important;
+    }
+  }
+
+</style>
+
+{% schema %}
+{
+  "name": "Narrative Arc",
+  "tag": "section",
+  "class": "narrative-arc-section",
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "🎨 Section Background"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#0d0d0d"
+    },
+    {
+      "type": "header",
+      "content": "📐 Layout & Spacing"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "label": "Max Container Width (px)",
+      "min": 800,
+      "max": 1920,
+      "step": 20,
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "container_padding",
+      "label": "Container Side Padding (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Section Padding Top (px)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Section Padding Bottom (px)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "header_bottom_spacing",
+      "label": "Header Bottom Spacing (px)",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 40
+    },
+    {
+  "type": "range",
+  "id": "section_padding_top_tablet",
+  "label": "Tablet Section Padding Top (px)",
+  "min": 0,
+  "max": 200,
+  "step": 4,
+  "default": 60
+},
+{
+  "type": "range",
+  "id": "section_padding_bottom_tablet",
+  "label": "Tablet Section Padding Bottom (px)",
+  "min": 0,
+  "max": 200,
+  "step": 4,
+  "default": 60
+},
+{
+  "type": "range",
+  "id": "section_padding_top_mobile",
+  "label": "Mobile Section Padding Top (px)",
+  "min": 0,
+  "max": 200,
+  "step": 4,
+  "default": 40
+},
+{
+  "type": "range",
+  "id": "section_padding_bottom_mobile",
+  "label": "Mobile Section Padding Bottom (px)",
+  "min": 0,
+  "max": 200,
+  "step": 4,
+  "default": 40
+},
+    {
+  "type": "color",
+  "id": "border_top_color",
+  "label": "Top Border Color",
+  "default": "#f5f2ec"
+},
+{
+  "type": "range",
+  "id": "border_top_opacity",
+  "label": "Top Border Opacity",
+  "min": 0,
+  "max": 100,
+  "step": 2,
+  "default": 20
+},
+    {
+      "type": "header",
+      "content": "— Eyebrow Label"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "THE ARC"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow Color",
+      "default": "#888888"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_font_size",
+      "label": "Eyebrow Font Size (px)",
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "eyebrow_font_weight",
+      "label": "Eyebrow Font Weight",
+      "options": [
+        { "value": "300", "label": "Light (300)" },
+        { "value": "400", "label": "Regular (400)" },
+        { "value": "500", "label": "Medium (500)" },
+        { "value": "600", "label": "Semi Bold (600)" },
+        { "value": "700", "label": "Bold (700)" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_letter_spacing",
+      "label": "Eyebrow Letter Spacing (em × 10)",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_bottom_spacing",
+      "label": "Eyebrow Bottom Spacing (px)",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "📝 Main Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading Text",
+      "default": "THE NARRATIVE AT THE CORE."
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading HTML Tag",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#f5f0e8"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading Max Font Size (px)",
+      "min": 32,
+      "max": 120,
+      "step": 2,
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_min",
+      "label": "Heading Min Font Size (px, mobile)",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size_vw",
+      "label": "Heading Fluid Font Size (vw)",
+      "min": 2,
+      "max": 10,
+      "step": 0.1,
+      "default": 5
+    },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Heading Font Weight",
+      "options": [
+        { "value": "400", "label": "Regular (400)" },
+        { "value": "600", "label": "Semi Bold (600)" },
+        { "value": "700", "label": "Bold (700)" },
+        { "value": "800", "label": "Extra Bold (800)" },
+        { "value": "900", "label": "Black (900)" }
+      ],
+      "default": "900"
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing",
+      "label": "Heading Letter Spacing (em × 100)",
+      "min": -5,
+      "max": 10,
+      "step": 1,
+      "default": -2
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height",
+      "label": "Heading Line Height (× 10)",
+      "min": 8,
+      "max": 15,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "select",
+      "id": "heading_text_transform",
+      "label": "Heading Text Transform",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "uppercase", "label": "UPPERCASE" },
+        { "value": "lowercase", "label": "lowercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "header",
+      "content": "📏 Divider"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_divider",
+      "label": "Show Divider",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider / Column Border Color",
+      "default": "#2e2e2e"
+    },
+    {
+  "type": "range",
+  "id": "divider_opacity",
+  "label": "Divider Opacity",
+  "min": 0,
+  "max": 100,
+  "step": 1,
+  "default": 18
+},
+    {
+      "type": "range",
+      "id": "divider_thickness",
+      "label": "Divider Thickness (px)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "🧩 Stage Card Spacing"
+    },
+    {
+      "type": "range",
+      "id": "stage_padding_vertical",
+      "label": "Stage Card Vertical Padding (px)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "stage_padding_horizontal",
+      "label": "Stage Card Horizontal Padding (px)",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "stage_label_bottom_spacing",
+      "label": "Stage Label Bottom Spacing (px)",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "stage_title_bottom_spacing",
+      "label": "Stage Title Bottom Spacing (px)",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 12
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stage",
+      "name": "Stage",
+      "settings": [
+        {
+          "type": "header",
+          "content": "🏷️ Stage Label"
+        },
+        {
+          "type": "text",
+          "id": "stage_label",
+          "label": "Stage Label (e.g. STAGE 01)",
+          "default": "STAGE 01"
+        },
+        {
+          "type": "color",
+          "id": "stage_label_color",
+          "label": "Stage Label Color",
+          "default": "#666666"
+        },
+        {
+          "type": "range",
+          "id": "stage_label_font_size",
+          "label": "Stage Label Font Size (px)",
+          "min": 8,
+          "max": 20,
+          "step": 1,
+          "default": 11
+        },
+        {
+          "type": "select",
+          "id": "stage_label_font_weight",
+          "label": "Stage Label Font Weight",
+          "options": [
+            { "value": "300", "label": "Light" },
+            { "value": "400", "label": "Regular" },
+            { "value": "500", "label": "Medium" },
+            { "value": "600", "label": "Semi Bold" },
+            { "value": "700", "label": "Bold" }
+          ],
+          "default": "400"
+        },
+        {
+          "type": "range",
+          "id": "stage_label_letter_spacing",
+          "label": "Stage Label Letter Spacing (em × 100)",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "default": 12
+        },
+        {
+          "type": "header",
+          "content": "📌 Stage Title"
+        },
+        {
+          "type": "text",
+          "id": "stage_title",
+          "label": "Stage Title",
+          "default": "FROM NOTHING"
+        },
+        {
+          "type": "color",
+          "id": "stage_title_color",
+          "label": "Stage Title Color",
+          "default": "#f5f0e8"
+        },
+        {
+          "type": "range",
+          "id": "stage_title_font_size",
+          "label": "Stage Title Font Size (px)",
+          "min": 14,
+          "max": 60,
+          "step": 1,
+          "default": 26
+        },
+        {
+          "type": "select",
+          "id": "stage_title_font_weight",
+          "label": "Stage Title Font Weight",
+          "options": [
+            { "value": "400", "label": "Regular" },
+            { "value": "600", "label": "Semi Bold" },
+            { "value": "700", "label": "Bold" },
+            { "value": "800", "label": "Extra Bold" },
+            { "value": "900", "label": "Black" }
+          ],
+          "default": "800"
+        },
+        {
+          "type": "range",
+          "id": "stage_title_letter_spacing",
+          "label": "Stage Title Letter Spacing (em × 100)",
+          "min": -5,
+          "max": 10,
+          "step": 1,
+          "default": -1
+        },
+        {
+          "type": "select",
+          "id": "stage_title_text_transform",
+          "label": "Stage Title Text Transform",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "uppercase", "label": "UPPERCASE" },
+            { "value": "lowercase", "label": "lowercase" },
+            { "value": "capitalize", "label": "Capitalize" }
+          ],
+          "default": "uppercase"
+        },
+        {
+          "type": "header",
+          "content": "📄 Stage Description"
+        },
+        {
+          "type": "textarea",
+          "id": "stage_description",
+          "label": "Stage Description",
+          "default": "Where the story begins. No edge, no inheritance."
+        },
+        {
+          "type": "color",
+          "id": "stage_description_color",
+          "label": "Stage Description Color",
+          "default": "#999999"
+        },
+        {
+          "type": "range",
+          "id": "stage_description_font_size",
+          "label": "Stage Description Font Size (px)",
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "default": 14
+        },
+        {
+          "type": "select",
+          "id": "stage_description_font_weight",
+          "label": "Stage Description Font Weight",
+          "options": [
+            { "value": "300", "label": "Light" },
+            { "value": "400", "label": "Regular" },
+            { "value": "500", "label": "Medium" }
+          ],
+          "default": "400"
+        },
+        {
+          "type": "range",
+          "id": "stage_description_line_height",
+          "label": "Stage Description Line Height (× 10)",
+          "min": 10,
+          "max": 20,
+          "step": 1,
+          "default": 16
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Narrative Arc",
+      "blocks": [
+        { "type": "stage" },
+        { "type": "stage" },
+        { "type": "stage" },
+        { "type": "stage" }
+      ]
+    }
+  ]
+}
+{% endschema %}

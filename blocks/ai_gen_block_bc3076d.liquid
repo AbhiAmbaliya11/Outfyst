@@ -1,0 +1,369 @@
+{% doc %}
+  @prompt
+    Create an "About Us" page section that matches this layout exactly:
+    
+    Layout: Two-column split layout (50/50)
+    - Left column: Full-height image (storefront/building photo)
+    - Right column: Text content area with light/cream background
+    
+    Right column content:
+    - Section heading: "ABOUT US" (centered, bold, uppercase, letter-spaced)
+    - Multiple body paragraphs
+    - Sub-heading: "About the Founders" (bold)
+    - More body paragraphs
+    
+    Schema settings (all editable):
+    - Left image (image_picker)
+    - Section heading text
+    - Body paragraph 1, 2, 3 (richtext)
+    - Sub-heading text
+    - Founder paragraph 1, 2 (richtext)
+    - Background color for right column
+    - Text color
+    - Heading font size
+    - Body font size
+    - Padding (top, bottom, left, right)
+    
+    Design: Clean, minimal, editorial style. Right column has generous padding. Clean sans-serif typography. Heading centered at top. Body text left-aligned, small, good line-height. No borders or shadows — flat, premium look. Fully responsive: stacks vertically on mobile (image on top, text below).
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-about-us-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  .ai-about-us-container-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    min-height: 600px;
+  }
+
+  .ai-about-us-image-column-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-about-us-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-about-us-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-about-us-image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .ai-about-us-text-column-{{ ai_gen_id }} {
+    background-color: {{ block.settings.background_color }};
+    color: {{ block.settings.text_color }};
+    padding: {{ block.settings.padding_top }}px {{ block.settings.padding_right }}px {{ block.settings.padding_bottom }}px {{ block.settings.padding_left }}px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .ai-about-us-content-{{ ai_gen_id }} {
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .ai-about-us-heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.heading_font_size }}px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-align: center;
+    margin: 0 0 40px 0;
+  }
+
+  .ai-about-us-body-{{ ai_gen_id }} {
+    font-size: {{ block.settings.body_font_size }}px;
+    line-height: 1.7;
+    text-align: left;
+    margin-bottom: 24px;
+  }
+
+  .ai-about-us-body-{{ ai_gen_id }}:last-child {
+    margin-bottom: 0;
+  }
+
+  .ai-about-us-subheading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.body_font_size | plus: 2 }}px;
+    font-weight: 700;
+    text-align: left;
+    margin: 32px 0 16px 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-about-us-container-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .ai-about-us-image-column-{{ ai_gen_id }} {
+      min-height: 400px;
+    }
+
+    .ai-about-us-text-column-{{ ai_gen_id }} {
+      padding: {{ block.settings.padding_top | times: 0.7 }}px {{ block.settings.padding_right | times: 0.7 }}px {{ block.settings.padding_bottom | times: 0.7 }}px {{ block.settings.padding_left | times: 0.7 }}px;
+    }
+
+    .ai-about-us-heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_font_size | times: 0.8 }}px;
+      margin-bottom: 30px;
+    }
+
+    .ai-about-us-body-{{ ai_gen_id }} {
+      font-size: {{ block.settings.body_font_size | times: 0.9 }}px;
+    }
+
+    .ai-about-us-subheading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.body_font_size | times: 0.9 | plus: 2 }}px;
+    }
+  }
+{% endstyle %}
+
+<ai-about-us-{{ ai_gen_id }} class="ai-about-us-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-about-us-container-{{ ai_gen_id }}">
+    <div class="ai-about-us-image-column-{{ ai_gen_id }}">
+      {% if block.settings.left_image %}
+        <img
+          src="{{ block.settings.left_image | image_url: width: 1200 }}"
+          alt="{{ block.settings.left_image.alt | escape }}"
+          loading="lazy"
+          width="{{ block.settings.left_image.width }}"
+          height="{{ block.settings.left_image.height }}"
+          class="ai-about-us-image-{{ ai_gen_id }}"
+        >
+      {% else %}
+        <div class="ai-about-us-image-placeholder-{{ ai_gen_id }}">
+          {{ 'image' | placeholder_svg_tag }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ai-about-us-text-column-{{ ai_gen_id }}">
+      <div class="ai-about-us-content-{{ ai_gen_id }}">
+        {% if block.settings.section_heading != blank %}
+          <h2 class="ai-about-us-heading-{{ ai_gen_id }}">{{ block.settings.section_heading }}</h2>
+        {% endif %}
+
+        {% if block.settings.body_paragraph_1 != blank %}
+          <div class="ai-about-us-body-{{ ai_gen_id }}">{{ block.settings.body_paragraph_1 }}</div>
+        {% endif %}
+
+        {% if block.settings.body_paragraph_2 != blank %}
+          <div class="ai-about-us-body-{{ ai_gen_id }}">{{ block.settings.body_paragraph_2 }}</div>
+        {% endif %}
+
+        {% if block.settings.body_paragraph_3 != blank %}
+          <div class="ai-about-us-body-{{ ai_gen_id }}">{{ block.settings.body_paragraph_3 }}</div>
+        {% endif %}
+
+        {% if block.settings.subheading_text != blank %}
+          <h3 class="ai-about-us-subheading-{{ ai_gen_id }}">{{ block.settings.subheading_text }}</h3>
+        {% endif %}
+
+        {% if block.settings.founder_paragraph_1 != blank %}
+          <div class="ai-about-us-body-{{ ai_gen_id }}">{{ block.settings.founder_paragraph_1 }}</div>
+        {% endif %}
+
+        {% if block.settings.founder_paragraph_2 != blank %}
+          <div class="ai-about-us-body-{{ ai_gen_id }}">{{ block.settings.founder_paragraph_2 }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</ai-about-us-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class AiAboutUs{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+    }
+
+    customElements.define('ai-about-us-{{ ai_gen_id }}', AiAboutUs{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "About us split",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "left_image",
+      "label": "Left image"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "section_heading",
+      "label": "Section heading",
+      "default": "ABOUT US"
+    },
+    {
+      "type": "richtext",
+      "id": "body_paragraph_1",
+      "label": "Body paragraph 1",
+      "default": "<p>We are a premium fashion brand dedicated to creating timeless pieces that blend modern design with exceptional craftsmanship.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "body_paragraph_2",
+      "label": "Body paragraph 2",
+      "default": "<p>Our collections are thoughtfully curated to reflect the evolving needs of the contemporary wardrobe, with an emphasis on quality materials and sustainable practices.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "body_paragraph_3",
+      "label": "Body paragraph 3",
+      "default": "<p>Every piece is designed to empower you to express your unique style with confidence and authenticity.</p>"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "subheading_text",
+      "label": "Subheading",
+      "default": "About the Founders"
+    },
+    {
+      "type": "richtext",
+      "id": "founder_paragraph_1",
+      "label": "Founder paragraph 1",
+      "default": "<p>Founded by a team of designers and entrepreneurs with a shared passion for fashion, our brand was born from a desire to create clothing that transcends trends.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "founder_paragraph_2",
+      "label": "Founder paragraph 2",
+      "default": "<p>With decades of combined experience in the industry, we bring a fresh perspective to classic silhouettes, ensuring every collection tells a story.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#f5f3ef"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "body_font_size",
+      "label": "Body size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Left",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Right",
+      "min": 0,
+      "max": 120,
+      "step": 8,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "About us split"
+    }
+  ],
+  "tag": null
+}
+{% endschema %}

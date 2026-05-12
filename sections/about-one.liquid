@@ -1,0 +1,349 @@
+{% comment %}
+  Section: Built Not Given – Story Hero
+  Location: sections/built-not-given.liquid
+{% endcomment %}
+
+<section
+  class="bng-section"
+  id="bng-{{ section.id }}"
+  style="
+    background-color: {{ section.settings.bg_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="bng-container">
+
+    {%- if section.settings.eyebrow != blank -%}
+      <p
+        class="bng-eyebrow"
+        style="
+          color: {{ section.settings.eyebrow_color }};
+          font-size: {{ section.settings.eyebrow_font_size }}px;
+        "
+      >
+        {{ section.settings.eyebrow }}
+      </p>
+    {%- endif -%}
+
+    <div class="bng-headline-wrap">
+      {%- if section.settings.headline_line1 != blank -%}
+        <h2
+          class="bng-headline bng-headline--line1"
+          style="
+            color: {{ section.settings.headline_line1_color }};
+            font-size: clamp(
+              {{ section.settings.headline_font_size_mobile }}px,
+              {{ section.settings.headline_font_size_fluid }}vw,
+              {{ section.settings.headline_font_size }}px
+            );
+          "
+        >
+          {{ section.settings.headline_line1 }}
+        </h2>
+      {%- endif -%}
+
+      {%- if section.settings.headline_line2 != blank -%}
+        <h2
+          class="bng-headline bng-headline--line2"
+          style="
+            color: {{ section.settings.headline_line2_color }};
+            font-size: clamp(
+              {{ section.settings.headline_font_size_mobile }}px,
+              {{ section.settings.headline_font_size_fluid }}vw,
+              {{ section.settings.headline_font_size }}px
+            );
+          "
+        >
+          {{ section.settings.headline_line2 }}
+        </h2>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.show_divider -%}
+      <hr
+        class="bng-divider"
+        style="border-color: {{ section.settings.divider_color }};"
+      >
+    {%- endif -%}
+
+    <div class="bng-body">
+      {%- if section.settings.body_left != blank -%}
+        <p
+          class="bng-body__col"
+          style="
+            color: {{ section.settings.body_color }};
+            font-size: {{ section.settings.body_font_size }}px;
+          "
+        >
+          {{ section.settings.body_left }}
+        </p>
+      {%- endif -%}
+
+      {%- if section.settings.body_right != blank -%}
+        <p
+          class="bng-body__col"
+          style="
+            color: {{ section.settings.body_color }};
+            font-size: {{ section.settings.body_font_size }}px;
+          "
+        >
+          {{ section.settings.body_right }}
+        </p>
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  #bng-{{ section.id }} {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  #bng-{{ section.id }} .bng-container {
+    max-width: {{ section.settings.container_max_width }}px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  #bng-{{ section.id }} .bng-eyebrow {
+    margin: 0 0 16px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  #bng-{{ section.id }} .bng-headline-wrap {
+    margin-bottom: 32px;
+  }
+
+  #bng-{{ section.id }} .bng-headline {
+    margin: 0;
+    line-height: 1.0;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    font-style: normal;
+  }
+
+  #bng-{{ section.id }} .bng-divider {
+    border: none;
+    border-top-width: 1px;
+    border-top-style: solid;
+    margin: 0 0 32px;
+  }
+
+  #bng-{{ section.id }} .bng-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  #bng-{{ section.id }} .bng-body__col {
+    margin: 0;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* ── Responsive ── */
+  @media screen and (max-width: 749px) {
+    #bng-{{ section.id }} .bng-body {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    #bng-{{ section.id }} .bng-container {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Built Not Given",
+  "tag": "section",
+  "class": "bng-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "container_max_width",
+      "label": "Container max width (px)",
+      "min": 600,
+      "max": 1600,
+      "step": 20,
+      "default": 1120
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top (px)",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom (px)",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#F0EDE8"
+    },
+    {
+      "type": "header",
+      "content": "Eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "— THE STORY · 2026"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#888888"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_font_size",
+      "label": "Eyebrow font size (px)",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "Headline"
+    },
+    {
+      "type": "text",
+      "id": "headline_line1",
+      "label": "Headline – Line 1",
+      "default": "BUILT."
+    },
+    {
+      "type": "color",
+      "id": "headline_line1_color",
+      "label": "Line 1 color",
+      "default": "#111111"
+    },
+    {
+      "type": "text",
+      "id": "headline_line2",
+      "label": "Headline – Line 2",
+      "default": "NOT GIVEN."
+    },
+    {
+      "type": "color",
+      "id": "headline_line2_color",
+      "label": "Line 2 color",
+      "default": "#8B0000"
+    },
+    {
+      "type": "range",
+      "id": "headline_font_size",
+      "label": "Headline font size – desktop max (px)",
+      "min": 48,
+      "max": 180,
+      "step": 4,
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "headline_font_size_mobile",
+      "label": "Headline font size – mobile min (px)",
+      "min": 32,
+      "max": 96,
+      "step": 2,
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "headline_font_size_fluid",
+      "label": "Headline font size – fluid vw value",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "info": "Used as the middle clamp() value in viewport width units."
+    },
+    {
+      "type": "header",
+      "content": "Divider"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_divider",
+      "label": "Show divider",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider color",
+      "default": "#CCCCCC"
+    },
+    {
+      "type": "header",
+      "content": "Body Copy"
+    },
+    {
+      "type": "textarea",
+      "id": "body_left",
+      "label": "Body – left column",
+      "default": "Nobody wrote a cheque on faith. No family name opened the door."
+    },
+    {
+      "type": "textarea",
+      "id": "body_right",
+      "label": "Body – right column",
+      "default": "OUTFYST was made the only way anything real gets made — in the dark, before anyone was watching."
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body text color",
+      "default": "#555555"
+    },
+    {
+      "type": "range",
+      "id": "body_font_size",
+      "label": "Body font size (px)",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "default": 15
+    }
+  ],
+  "presets": [
+    {
+      "name": "Built Not Given"
+    }
+  ]
+}
+{% endschema %}

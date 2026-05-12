@@ -1,0 +1,467 @@
+{% comment %}
+  Renders a product card — styled to match the featured-collection fc-card UI.
+
+  Accepts:
+  - card_product: {Object} Product Liquid object (optional)
+  - media_aspect_ratio: {String} "square", "portrait" or "adapt". Default "portrait".
+  - image_shape: {String} mask shape (arch, blob, etc.)
+  - show_secondary_image: {Boolean} Default false
+  - show_vendor: {Boolean} Default false
+  - show_rating: {Boolean} Default false
+  - extend_height: {Boolean} Default true
+  - lazy_load: {Boolean} Default true
+  - skip_styles: {Boolean} Default false
+  - quick_add: {String} "none" | "standard" | "bulk"
+  - section_id: {String}
+  - horizontal_class: {Boolean} Default false
+  - horizontal_quick_add: {Boolean} Default false
+  - placeholder_image: {String} Default 'product-apparel-2'
+
+  Usage:
+  {% render 'card-product', show_vendor: section.settings.show_vendor %}
+{% endcomment %}
+
+{%- unless skip_styles -%}
+  {{ 'component-rating.css' | asset_url | stylesheet_tag }}
+  {{ 'component-volume-pricing.css' | asset_url | stylesheet_tag }}
+  {{ 'component-price.css' | asset_url | stylesheet_tag }}
+  {{ 'quick-order-list.css' | asset_url | stylesheet_tag }}
+  {{ 'quantity-popover.css' | asset_url | stylesheet_tag }}
+
+  <style>
+    /* ══════════════════════════════════════════
+       FC-STYLE PRODUCT CARD  (card-product.liquid)
+    ══════════════════════════════════════════ */
+
+    .fc-card {
+      position: relative;
+      background: transparent;
+    }
+
+    /* Fixed 4:5 portrait image box */
+    .fc-card__img-wrap {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 4 / 5;
+      background: #dedede;
+      border-radius: 0;
+    }
+
+    .fc-card__img-wrap img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+      transition: transform 0.45s ease;
+    }
+
+    .fc-card:hover .fc-card__img-wrap img {
+      transform: scale(1.05);
+    }
+
+    .fc-card__img-wrap .placeholder-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── Badges (top-left) ── */
+    .fc-card__badges {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .fc-badge {
+      display: inline-block;
+      padding: 4px 9px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      line-height: 1.4;
+    }
+
+    .fc-badge--new      { background: #111; color: #fff; }
+    .fc-badge--sale     { background: #c0392b; color: #fff; }
+    .fc-badge--soldout  { background: #666; color: #fff; }
+
+    /* ── Bookmark / Wishlist icon (top-right) ── */
+    .fc-card__wishlist {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 4;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 0;
+      transition: opacity 0.2s;
+    }
+
+    .fc-card__wishlist:hover { opacity: 0.65; }
+
+    .fc-card__wishlist svg {
+      width: 22px;
+      height: 22px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.6));
+      transition: fill 0.2s;
+    }
+
+    .fc-card__wishlist.is-saved svg { fill: #fff; }
+
+    /* ── Quick Add button (slides up on hover) ── */
+    .fc-card__quick-add {
+      position: absolute;
+      bottom: 0px;
+      left: 12px;
+      right: 12px;
+      z-index: 3;
+      background: rgba(255, 255, 255, 0.85);
+      color: rgb(11, 11, 11);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-align: center;
+      text-decoration: none;
+      padding: 14px 12px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      display: block;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      width: calc(100% - 24px);
+    }
+
+    .fc-card:hover .fc-card__quick-add {
+      transform: translateY(0);
+      bottom: 12px;
+    }
+
+    /* ── Card info below image ── */
+    .fc-card__info {
+      padding: 12px 0 4px;
+    }
+
+    .fc-card__title {
+      font-size: 14px;
+      font-weight: 500;
+      color: rgb(11, 11, 11);
+      margin: 0 0 5px;
+      line-height: 1.35;
+    }
+
+    .fc-card__vendor {
+      font-size: 11px;
+      color: #888;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 0 0 4px;
+    }
+
+    .fc-card__price {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: rgb(11, 11, 11);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .fc-card__price-compare {
+      color: #999;
+      text-decoration: line-through;
+      font-size: 12px;
+    }
+
+    .fc-card__price-sale { color: rgb(11, 11, 11); font-weight: 600; }
+
+    /* Rating */
+    .fc-card__rating {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 5px;
+    }
+
+    /* Horizontal card variant */
+    .fc-card--horizontal {
+      display: flex;
+      gap: 16px;
+    }
+
+    .fc-card--horizontal .fc-card__img-wrap {
+      width: 100px;
+      min-width: 100px;
+      aspect-ratio: 4 / 5;
+    }
+
+    .fc-card--horizontal .fc-card__info {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    @media (max-width: 749px) {
+      .fc-card__title,
+      .fc-card__price { font-size: 13px; }
+    }
+  </style>
+{%- endunless -%}
+
+{%- if card_product and card_product != empty -%}
+
+  {%- liquid
+    assign is_new    = false
+    assign is_on_sale = false
+
+    if card_product.tags contains 'new' or card_product.tags contains 'New' or card_product.tags contains 'NEW'
+      assign is_new = true
+    endif
+    if card_product.compare_at_price > card_product.price and card_product.compare_at_price != blank
+      assign is_on_sale = true
+    endif
+
+    assign product_form_id = 'quick-add-' | append: section_id | append: card_product.id
+  -%}
+
+  <div class="fc-card{% if horizontal_class %} fc-card--horizontal{% endif %}">
+
+    {%- comment -%} ── Image Wrapper ── {%- endcomment -%}
+    <div class="fc-card__img-wrap">
+
+      {%- comment -%} Badges {%- endcomment -%}
+      <div class="fc-card__badges">
+        {%- if card_product.available == false -%}
+          <span class="fc-badge fc-badge--soldout">Sold Out</span>
+        {%- else -%}
+          {%- if is_new -%}<span class="fc-badge fc-badge--new">New</span>{%- endif -%}
+          {%- if is_on_sale -%}<span class="fc-badge fc-badge--sale">Sale</span>{%- endif -%}
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} Bookmark / Wishlist ── {%- endcomment -%}
+      {% comment %} <button
+        class="fc-card__wishlist"
+        aria-label="Save {{ card_product.title | escape }}"
+        onclick="this.classList.toggle('is-saved')"
+        type="button"
+      >
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+        </svg>
+      </button> {% endcomment %}
+
+      {%- comment -%} Product image {%- endcomment -%}
+      <a href="{{ card_product.url }}" aria-label="{{ card_product.title | escape }}" tabindex="-1">
+        {%- if card_product.featured_media -%}
+          <img
+            srcset="
+              {%- if card_product.featured_media.width >= 165 -%}{{ card_product.featured_media | image_url: width: 165 }} 165w,{%- endif -%}
+              {%- if card_product.featured_media.width >= 360 -%}{{ card_product.featured_media | image_url: width: 360 }} 360w,{%- endif -%}
+              {%- if card_product.featured_media.width >= 533 -%}{{ card_product.featured_media | image_url: width: 533 }} 533w,{%- endif -%}
+              {%- if card_product.featured_media.width >= 720 -%}{{ card_product.featured_media | image_url: width: 720 }} 720w,{%- endif -%}
+              {%- if card_product.featured_media.width >= 940 -%}{{ card_product.featured_media | image_url: width: 940 }} 940w,{%- endif -%}
+              {%- if card_product.featured_media.width >= 1066 -%}{{ card_product.featured_media | image_url: width: 1066 }} 1066w,{%- endif -%}
+              {{ card_product.featured_media | image_url }} {{ card_product.featured_media.width }}w
+            "
+            src="{{ card_product.featured_media | image_url: width: 533 }}"
+            sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 130 | divided_by: 4 }}px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)"
+            alt="{{ card_product.featured_media.alt | escape }}"
+            {% unless lazy_load == false %}loading="lazy"{% endunless %}
+            width="{{ card_product.featured_media.width }}"
+            height="{{ card_product.featured_media.height }}"
+          >
+
+          {%- if card_product.media[1] != null and show_secondary_image -%}
+            <img
+              srcset="
+                {%- if card_product.media[1].width >= 165 -%}{{ card_product.media[1] | image_url: width: 165 }} 165w,{%- endif -%}
+                {%- if card_product.media[1].width >= 360 -%}{{ card_product.media[1] | image_url: width: 360 }} 360w,{%- endif -%}
+                {%- if card_product.media[1].width >= 533 -%}{{ card_product.media[1] | image_url: width: 533 }} 533w,{%- endif -%}
+                {%- if card_product.media[1].width >= 720 -%}{{ card_product.media[1] | image_url: width: 720 }} 720w,{%- endif -%}
+                {%- if card_product.media[1].width >= 940 -%}{{ card_product.media[1] | image_url: width: 940 }} 940w,{%- endif -%}
+                {%- if card_product.media[1].width >= 1066 -%}{{ card_product.media[1] | image_url: width: 1066 }} 1066w,{%- endif -%}
+                {{ card_product.media[1] | image_url }} {{ card_product.media[1].width }}w
+              "
+              src="{{ card_product.media[1] | image_url: width: 533 }}"
+              sizes="(min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 130 | divided_by: 4 }}px, (min-width: 990px) calc((100vw - 130px) / 4), (min-width: 750px) calc((100vw - 120px) / 3), calc((100vw - 35px) / 2)"
+              alt="{{ card_product.media[1].alt | escape }}"
+              loading="lazy"
+              width="{{ card_product.media[1].width }}"
+              height="{{ card_product.media[1].height }}"
+            >
+          {%- endif -%}
+
+        {%- else -%}
+          {%- assign placeholder_img = placeholder_image | default: 'product-apparel-2' -%}
+          {{ placeholder_img | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+      </a>
+
+      {%- comment -%} ── Quick Add Button (slides up on hover) ── {%- endcomment -%}
+      {%- unless quick_add == 'none' or quick_add == blank -%}
+        {%- if card_product.available -%}
+          {%- if card_product.variants_count > 1 -%}
+            {%- comment -%} Multiple variants → open quick-add modal {%- endcomment -%}
+            <modal-opener data-modal="#QuickAdd-{{ card_product.id }}">
+              <button
+                id="{{ product_form_id }}-submit"
+                type="button"
+                class="fc-card__quick-add"
+                aria-haspopup="dialog"
+                aria-labelledby="{{ product_form_id }}-submit title-{{ section_id }}-{{ card_product.id }}"
+                data-product-url="{{ card_product.url }}"
+              >
+                Choose Options +
+                {%- render 'loading-spinner' -%}
+              </button>
+            </modal-opener>
+            <quick-add-modal id="QuickAdd-{{ card_product.id }}" class="quick-add-modal">
+              <div
+                role="dialog"
+                aria-label="{{ 'products.product.choose_product_options' | t: product_name: card_product.title | escape }}"
+                aria-modal="true"
+                class="quick-add-modal__content global-settings-popup"
+                tabindex="-1"
+              >
+                <button id="ModalClose-{{ card_product.id }}" type="button" class="quick-add-modal__toggle" aria-label="{{ 'accessibility.close' | t }}">
+                  {{- 'icon-close.svg' | inline_asset_content -}}
+                </button>
+                <div id="QuickAddInfo-{{ card_product.id }}" class="quick-add-modal__content-info"></div>
+              </div>
+            </quick-add-modal>
+          {%- else -%}
+            {%- comment -%} Single variant → direct add to cart {%- endcomment -%}
+            <product-form data-section-id="{{ section_id }}">
+              {%- form 'product', card_product, id: product_form_id, class: 'form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+                <input type="hidden" name="id" value="{{ card_product.selected_or_first_available_variant.id }}" class="product-variant-id">
+                <button
+                  id="{{ product_form_id }}-submit"
+                  type="submit"
+                  name="add"
+                  class="fc-card__quick-add"
+                  aria-labelledby="{{ product_form_id }}-submit title-{{ section_id }}-{{ card_product.id }}"
+                  aria-live="polite"
+                  data-sold-out-message="true"
+                >
+                  <span>Quick Add +</span>
+                  <span class="sold-out-message hidden">{{ 'products.product.sold_out' | t }}</span>
+                  {%- render 'loading-spinner' -%}
+                </button>
+              {%- endform -%}
+            </product-form>
+          {%- endif -%}
+        {%- else -%}
+          {%- comment -%} Sold out — show disabled button {%- endcomment -%}
+          <button type="button" class="fc-card__quick-add" disabled style="opacity:0.5;cursor:default;">
+            {{ 'products.product.sold_out' | t }}
+          </button>
+        {%- endif -%}
+      {%- endunless -%}
+
+    </div>
+    {%- comment -%} ── END img-wrap ── {%- endcomment -%}
+
+    {%- comment -%} ── Card Info ── {%- endcomment -%}
+    <div class="fc-card__info">
+
+      {%- if show_vendor and card_product.vendor != blank -%}
+        <p class="fc-card__vendor">{{ card_product.vendor }}</p>
+      {%- endif -%}
+
+      <a href="{{ card_product.url }}" style="text-decoration:none;">
+        <p
+          class="fc-card__title"
+          id="title-{{ section_id }}-{{ card_product.id }}"
+        >{{ card_product.title | escape }}</p>
+      </a>
+
+      <div class="fc-card__price">
+        {%- if is_on_sale -%}
+          <span class="fc-card__price-sale">{{ card_product.price | money_without_trailing_zeros }}</span>
+          <span class="fc-card__price-compare">{{ card_product.compare_at_price | money_without_trailing_zeros }}</span>
+        {%- elsif card_product.available == false -%}
+          <span style="color:#999;">{{ 'products.product.sold_out' | t }}</span>
+        {%- else -%}
+          <span>{{ card_product.price | money_without_trailing_zeros }}</span>
+        {%- endif -%}
+      </div>
+
+      {%- if show_rating and card_product.metafields.reviews.rating.value != blank -%}
+        {%- liquid
+          assign rating_decimal = 0
+          assign decimal = card_product.metafields.reviews.rating.value.rating | modulo: 1
+          if decimal >= 0.3 and decimal <= 0.7
+            assign rating_decimal = 0.5
+          elsif decimal > 0.7
+            assign rating_decimal = 1
+          endif
+        -%}
+        <div class="fc-card__rating">
+          <div
+            class="rating"
+            role="img"
+            aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: card_product.metafields.reviews.rating.value, rating_max: card_product.metafields.reviews.rating.value.scale_max }}"
+          >
+            <span
+              aria-hidden="true"
+              class="rating-star"
+              style="--rating: {{ card_product.metafields.reviews.rating.value.rating | floor }}; --rating-max: {{ card_product.metafields.reviews.rating.value.scale_max }}; --rating-decimal: {{ rating_decimal }};"
+            ></span>
+          </div>
+          <p class="rating-text caption">
+            <span aria-hidden="true">
+              {{- card_product.metafields.reviews.rating.value }} /
+              {{ card_product.metafields.reviews.rating.value.scale_max -}}
+            </span>
+          </p>
+          <p class="rating-count caption">
+            <span aria-hidden="true">({{ card_product.metafields.reviews.rating_count }})</span>
+            <span class="visually-hidden">{{ card_product.metafields.reviews.rating_count }} {{ 'accessibility.total_reviews' | t }}</span>
+          </p>
+        </div>
+      {%- endif -%}
+
+    </div>
+    {%- comment -%} ── END card info ── {%- endcomment -%}
+
+  </div>
+
+{%- else -%}
+
+  {%- comment -%} ── Placeholder when no product object is passed ── {%- endcomment -%}
+  {%- assign placeholder_img = placeholder_image | default: 'product-apparel-2' -%}
+
+  <div class="fc-card">
+    <div class="fc-card__img-wrap">
+      {{ placeholder_img | placeholder_svg_tag: 'placeholder-svg' }}
+    </div>
+    <div class="fc-card__info">
+      <p class="fc-card__title">{{ 'onboarding.product_title' | t }}</p>
+      <div class="fc-card__price">
+        <span>{% render 'price', placeholder: true, show_compare_at_price: true %}</span>
+      </div>
+    </div>
+  </div>
+
+{%- endif -%}

@@ -1,0 +1,333 @@
+{% comment %}
+  Section: End of Volume Banner
+  File: sections/end-of-volume-banner.liquid
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@700&display=swap" rel="stylesheet">
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --eov-max-width:        {{ section.settings.max_width }}px;
+    --eov-margin-bottom:    {{ section.settings.margin_bottom }}px;
+    --eov-padding-x:        {{ section.settings.padding_x }}px;
+    --eov-padding-y:        {{ section.settings.padding_y }}px;
+    --eov-heading-size:     {{ section.settings.heading_size }}px;
+    --eov-heading-spacing:  {{ section.settings.heading_letter_spacing }}em;
+    --eov-link-size:        {{ section.settings.link_font_size }}px;
+    --eov-link-spacing:     {{ section.settings.link_letter_spacing }}em;
+    --eov-gap:              {{ section.settings.gap }}px;
+    --eov-bg:               {{ section.settings.bg_color }};
+    --eov-text:             {{ section.settings.text_color }};
+    --eov-border:           {{ section.settings.border_color }};
+    --eov-border-opacity:   {{ section.settings.border_opacity | divided_by: 100.0 }};
+  }
+
+  #shopify-section-{{ section.id }} .eov-section {
+    background: var(--eov-bg);
+    width: 100%;
+  }
+#shopify-section-{{ section.id }} {
+  background: var(--eov-bg);
+}
+  #shopify-section-{{ section.id }} .eov-inner {
+    max-width: var(--eov-max-width);
+    margin: 0 auto;
+    padding: 0 var(--eov-padding-x) var(--eov-margin-bottom);
+    border-top: 0.5px solid rgba(0, 0, 0, 0.18);
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.18);
+  }
+
+
+
+  #shopify-section-{{ section.id }} .eov-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--eov-padding-y) 0;
+    border-top: 0.5px solid {{ section.settings.border_color | color_modify: 'alpha', section.settings.border_opacity | divided_by: 100.0 }};
+    border-bottom: 0.5px solid {{ section.settings.border_color | color_modify: 'alpha', section.settings.border_opacity | divided_by: 100.0 }};
+    gap: var(--eov-gap);
+  }
+
+  #shopify-section-{{ section.id }} .eov-heading {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: var(--eov-heading-size);
+    letter-spacing: var(--eov-heading-spacing);
+    text-transform: uppercase;
+    color: var(--eov-text);
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  #shopify-section-{{ section.id }} .eov-link {
+    font-family: 'Manrope', sans-serif;
+    font-size: var(--eov-link-size);
+    font-weight: 700;
+    letter-spacing: var(--eov-link-spacing);
+    text-transform: uppercase;
+    color: var(--eov-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--eov-text);
+    padding-bottom: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    position: relative;
+    transition: opacity 0.2s ease, letter-spacing 0.25s ease;
+  }
+
+  #shopify-section-{{ section.id }} .eov-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 0%;
+    height: 1px;
+    background: var(--eov-text);
+    transition: width 0.28s ease;
+  }
+
+  #shopify-section-{{ section.id }} .eov-link:hover {
+    opacity: 0.6;
+    letter-spacing: calc(var(--eov-link-spacing) + 0.04em);
+  }
+
+  #shopify-section-{{ section.id }} .eov-link:hover::after {
+    width: 100%;
+  }
+
+  @media screen and (max-width: 1024px) {
+    #shopify-section-{{ section.id }} {
+      --eov-padding-x: {{ section.settings.padding_x | times: 0.75 | round }}px;
+      --eov-heading-size: {{ section.settings.heading_size | times: 0.85 | round }}px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} {
+      --eov-padding-x: 20px;
+      --eov-padding-y: {{ section.settings.padding_y | times: 0.75 | round }}px;
+      --eov-heading-size: {{ section.settings.heading_size | times: 0.7 | round }}px;
+      --eov-link-size: 10px;
+      --eov-gap: 16px;
+      --eov-margin-bottom: {{ section.settings.margin_bottom | times: 0.6 | round }}px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    #shopify-section-{{ section.id }} {
+      --eov-padding-x: 16px;
+      --eov-heading-size: {{ section.settings.heading_size | times: 0.58 | round }}px;
+      --eov-gap: 12px;
+    }
+
+    {% if section.settings.stack_on_mobile %}
+      #shopify-section-{{ section.id }} .eov-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    {% endif %}
+  }
+</style>
+
+<div class="eov-section">
+  <div class="eov-inner">
+    <div class="eov-row">
+      <p class="eov-heading">{{ section.settings.heading_text }}</p>
+      {% if section.settings.link_label != blank %}
+        <a
+          href="{{ section.settings.link_url }}"
+          class="eov-link"
+          {% if section.settings.link_new_tab %}target="_blank" rel="noopener"{% endif %}
+        >
+          {{ section.settings.link_label }}
+          {% if section.settings.show_arrow %} →{% endif %}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "End of Volume Banner",
+  "tag": "section",
+  "class": "section-end-of-volume",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading_text",
+      "label": "Heading Text",
+      "default": "End of Vol. I."
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link Label",
+      "default": "Shop the Drop"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrow",
+      "label": "Show arrow (→) after link",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "link_new_tab",
+      "label": "Open link in new tab",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "stack_on_mobile",
+      "label": "Stack heading & link on mobile",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F5F2EC"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & Link Color",
+      "default": "#0B0B0B"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#000000"
+    },
+    {
+    "type": "range",
+    "id": "border_opacity",
+    "label": "Border Opacity (%)",
+    "min": 0,
+    "max": 100,
+    "step": 2,
+    "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading Font Size (px)",
+      "min": 14,
+      "max": 64,
+      "step": 1,
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "heading_letter_spacing",
+      "label": "Heading Letter Spacing",
+      "options": [
+        { "value": "-0.03", "label": "-0.03em — Very Tight" },
+        { "value": "-0.015", "label": "-0.015em — Tight" },
+        { "value": "0", "label": "0em — Normal" },
+        { "value": "0.02", "label": "0.02em — Wide" },
+        { "value": "0.05", "label": "0.05em — Very Wide" }
+      ],
+      "default": "-0.015"
+    },
+    {
+      "type": "range",
+      "id": "link_font_size",
+      "label": "Link Font Size (px)",
+      "min": 9,
+      "max": 18,
+      "step": 1,
+      "default": 11
+    },
+    {
+      "type": "select",
+      "id": "link_letter_spacing",
+      "label": "Link Letter Spacing",
+      "options": [
+        { "value": "0.1", "label": "0.1em" },
+        { "value": "0.2", "label": "0.2em" },
+        { "value": "0.32", "label": "0.32em — Default" },
+        { "value": "0.4", "label": "0.4em" },
+        { "value": "0.5", "label": "0.5em" }
+      ],
+      "default": "0.32"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Section Max Width (px)",
+      "min": 800,
+      "max": 1800,
+      "step": 50,
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Section Margin Bottom (px)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "label": "Section Side Padding (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_y",
+      "label": "Row Padding Top & Bottom (px)",
+      "min": 8,
+      "max": 80,
+      "step": 2,
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap Between Heading & Link (px)",
+      "min": 8,
+      "max": 120,
+      "step": 4,
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "End of Volume Banner",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

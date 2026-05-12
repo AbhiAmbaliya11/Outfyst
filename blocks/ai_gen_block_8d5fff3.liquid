@@ -1,0 +1,1054 @@
+{% doc %}
+  @prompt
+    Create a tabbed FAQ section with the following tabs: Product, Delivery, Order, Order Received, Exchanges, General FAQs. Each tab shows its own set of accordion-style FAQ questions and answers. The first tab (Product) is active by default. Clicking a tab switches to that tab's FAQ content. Each FAQ item expands/collapses on click showing a + icon when closed and × when open. Style: clean white cards, light gray background, bold uppercase tab labels, black active tab with white text, rounded pill-shaped tab buttons. The accordion items have a thin border, with the question in bold uppercase small text and the answer in light gray smaller text. Make all tab switching and accordion behavior CSS-only (no JavaScript). Each tab should have at least 3-4 sample FAQ questions with placeholder answers relevant to a fashion/clothing brand.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-faq-tabs-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.section_padding }}px;
+  }
+
+  .ai-faq-tabs__container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  .ai-faq-tabs__heading-{{ ai_gen_id }} {
+    text-align: center;
+    margin: 0 0 {{ block.settings.heading_spacing }}px;
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.heading_color }};
+  }
+
+  .ai-faq-tabs__tab-list-{{ ai_gen_id }} {
+    display: flex;
+    flex-wrap: wrap;
+    gap: {{ block.settings.tab_gap }}px;
+    margin-bottom: {{ block.settings.tab_content_gap }}px;
+    justify-content: center;
+  }
+
+  .ai-faq-tabs__tab-input-{{ ai_gen_id }} {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .ai-faq-tabs__tab-label-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: {{ block.settings.tab_padding_vertical }}px {{ block.settings.tab_padding_horizontal }}px;
+    background-color: {{ block.settings.tab_bg_color }};
+    color: {{ block.settings.tab_text_color }};
+    border-radius: {{ block.settings.tab_border_radius }}px;
+    cursor: pointer;
+    font-size: {{ block.settings.tab_font_size }}px;
+    font-weight: {{ block.settings.tab_font_weight }};
+    text-transform: {{ block.settings.tab_text_transform }};
+    letter-spacing: {{ block.settings.tab_letter_spacing }}px;
+    transition: all 0.3s ease;
+    border: {{ block.settings.tab_border_width }}px solid {{ block.settings.tab_border_color }};
+  }
+
+  .ai-faq-tabs__tab-label-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.tab_hover_bg_color }};
+    color: {{ block.settings.tab_hover_text_color }};
+  }
+
+  .ai-faq-tabs__tab-input-{{ ai_gen_id }}:checked + .ai-faq-tabs__tab-label-{{ ai_gen_id }} {
+    background-color: {{ block.settings.tab_active_bg_color }};
+    color: {{ block.settings.tab_active_text_color }};
+  }
+
+  .ai-faq-tabs__content-{{ ai_gen_id }} {
+    display: none;
+    background-color: {{ block.settings.content_bg_color }};
+    border-radius: {{ block.settings.content_border_radius }}px;
+    padding: {{ block.settings.content_padding }}px;
+  }
+
+  .ai-faq-tabs__tab-input-{{ ai_gen_id }}:checked ~ .ai-faq-tabs__content-{{ ai_gen_id }} {
+    display: block;
+  }
+
+  .ai-faq-tabs__accordion-item-{{ ai_gen_id }} {
+    border: {{ block.settings.accordion_border_width }}px solid {{ block.settings.accordion_border_color }};
+    border-radius: {{ block.settings.accordion_border_radius }}px;
+    margin-bottom: {{ block.settings.accordion_gap }}px;
+    overflow: hidden;
+  }
+
+  .ai-faq-tabs__accordion-item-{{ ai_gen_id }}:last-child {
+    margin-bottom: 0;
+  }
+
+  .ai-faq-tabs__accordion-input-{{ ai_gen_id }} {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .ai-faq-tabs__accordion-question-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: {{ block.settings.question_padding }}px;
+    cursor: pointer;
+    background-color: {{ block.settings.question_bg_color }};
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-faq-tabs__accordion-question-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.question_hover_bg_color }};
+  }
+
+  .ai-faq-tabs__question-text-{{ ai_gen_id }} {
+    font-size: {{ block.settings.question_font_size }}px;
+    font-weight: {{ block.settings.question_font_weight }};
+    text-transform: {{ block.settings.question_text_transform }};
+    letter-spacing: {{ block.settings.question_letter_spacing }}px;
+    color: {{ block.settings.question_color }};
+    margin: 0;
+    padding-right: 20px;
+  }
+
+  .ai-faq-tabs__accordion-icon-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    width: {{ block.settings.icon_size }}px;
+    height: {{ block.settings.icon_size }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: {{ block.settings.icon_size }}px;
+    color: {{ block.settings.icon_color }};
+    font-weight: 300;
+    line-height: 1;
+  }
+
+  .ai-faq-tabs__accordion-icon-{{ ai_gen_id }}::before {
+    content: '+';
+  }
+
+  .ai-faq-tabs__accordion-input-{{ ai_gen_id }}:checked ~ .ai-faq-tabs__accordion-question-{{ ai_gen_id }} .ai-faq-tabs__accordion-icon-{{ ai_gen_id }}::before {
+    content: '×';
+  }
+
+  .ai-faq-tabs__accordion-answer-{{ ai_gen_id }} {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .ai-faq-tabs__accordion-input-{{ ai_gen_id }}:checked ~ .ai-faq-tabs__accordion-answer-{{ ai_gen_id }} {
+    max-height: 1000px;
+  }
+
+  .ai-faq-tabs__answer-content-{{ ai_gen_id }} {
+    padding: {{ block.settings.answer_padding }}px;
+    font-size: {{ block.settings.answer_font_size }}px;
+    color: {{ block.settings.answer_color }};
+    line-height: 1.6;
+    background-color: {{ block.settings.answer_bg_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-faq-tabs__tab-list-{{ ai_gen_id }} {
+      gap: {{ block.settings.tab_gap | times: 0.7 }}px;
+    }
+
+    .ai-faq-tabs__tab-label-{{ ai_gen_id }} {
+      font-size: {{ block.settings.tab_font_size | times: 0.85 }}px;
+      padding: {{ block.settings.tab_padding_vertical | times: 0.8 }}px {{ block.settings.tab_padding_horizontal | times: 0.8 }}px;
+    }
+
+    .ai-faq-tabs__heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_size | times: 0.8 }}px;
+    }
+  }
+{% endstyle %}
+
+<faq-tabs-{{ ai_gen_id }} class="ai-faq-tabs-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-faq-tabs__container-{{ ai_gen_id }}">
+    {% if block.settings.heading != blank %}
+      <h2 class="ai-faq-tabs__heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+    {% endif %}
+
+    <div class="ai-faq-tabs__tab-list-{{ ai_gen_id }}">
+      <input
+        type="radio"
+        name="faq-tab-{{ ai_gen_id }}"
+        id="tab-product-{{ ai_gen_id }}"
+        class="ai-faq-tabs__tab-input-{{ ai_gen_id }}"
+        checked
+      >
+      <label for="tab-product-{{ ai_gen_id }}" class="ai-faq-tabs__tab-label-{{ ai_gen_id }}">
+        {{ block.settings.tab_1_label }}
+      </label>
+
+      <input
+        type="radio"
+        name="faq-tab-{{ ai_gen_id }}"
+        id="tab-delivery-{{ ai_gen_id }}"
+        class="ai-faq-tabs__tab-input-{{ ai_gen_id }}"
+      >
+      <label for="tab-delivery-{{ ai_gen_id }}" class="ai-faq-tabs__tab-label-{{ ai_gen_id }}">
+        {{ block.settings.tab_2_label }}
+      </label>
+
+      <input
+        type="radio"
+        name="faq-tab-{{ ai_gen_id }}"
+        id="tab-order-{{ ai_gen_id }}"
+        class="ai-faq-tabs__tab-input-{{ ai_gen_id }}"
+      >
+      <label for="tab-order-{{ ai_gen_id }}" class="ai-faq-tabs__tab-label-{{ ai_gen_id }}">
+        {{ block.settings.tab_3_label }}
+      </label>
+
+      <input
+        type="radio"
+        name="faq-tab-{{ ai_gen_id }}"
+        id="tab-received-{{ ai_gen_id }}"
+        class="ai-faq-tabs__tab-input-{{ ai_gen_id }}"
+      >
+      <label for="tab-received-{{ ai_gen_id }}" class="ai-faq-tabs__tab-label-{{ ai_gen_id }}">
+        {{ block.settings.tab_4_label }}
+      </label>
+
+      <input
+        type="radio"
+        name="faq-tab-{{ ai_gen_id }}"
+        id="tab-exchanges-{{ ai_gen_id }}"
+        class="ai-faq-tabs__tab-input-{{ ai_gen_id }}"
+      >
+      <label for="tab-exchanges-{{ ai_gen_id }}" class="ai-faq-tabs__tab-label-{{ ai_gen_id }}">
+        {{ block.settings.tab_5_label }}
+      </label>
+
+      <input
+        type="radio"
+        name="faq-tab-{{ ai_gen_id }}"
+        id="tab-general-{{ ai_gen_id }}"
+        class="ai-faq-tabs__tab-input-{{ ai_gen_id }}"
+      >
+      <label for="tab-general-{{ ai_gen_id }}" class="ai-faq-tabs__tab-label-{{ ai_gen_id }}">
+        {{ block.settings.tab_6_label }}
+      </label>
+    </div>
+
+    <input type="radio" name="faq-tab-{{ ai_gen_id }}" id="tab-product-{{ ai_gen_id }}" class="ai-faq-tabs__tab-input-{{ ai_gen_id }}" checked>
+    <div class="ai-faq-tabs__content-{{ ai_gen_id }}">
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="product-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="product-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">What materials are your garments made from?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Our collections feature premium fabrics including organic cotton, sustainable linen, and innovative recycled materials. Each product page includes detailed fabric composition and care instructions.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="product-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="product-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">How do I find my correct size?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            We provide detailed size guides on each product page. Measure yourself and compare with our charts. If you're between sizes, we recommend sizing up for a relaxed fit or down for a fitted look.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="product-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="product-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">Are your products sustainable?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Sustainability is at our core. We use eco-friendly materials, ethical manufacturing processes, and minimal packaging. Look for our sustainability badge on product pages for certified items.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="product-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="product-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">How should I care for my garments?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Each item includes specific care instructions on the label. Generally, we recommend cold water washing, air drying, and avoiding harsh chemicals to maintain quality and extend garment life.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="radio" name="faq-tab-{{ ai_gen_id }}" id="tab-delivery-{{ ai_gen_id }}" class="ai-faq-tabs__tab-input-{{ ai_gen_id }}">
+    <div class="ai-faq-tabs__content-{{ ai_gen_id }}">
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="delivery-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="delivery-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">What are your shipping options?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            We offer standard shipping (5-7 business days) and express shipping (2-3 business days). Free standard shipping is available on orders over a certain amount. International shipping options vary by region.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="delivery-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="delivery-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">How can I track my order?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Once your order ships, you'll receive a tracking number via email. Use this number on our tracking page or the carrier's website to monitor your delivery in real-time.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="delivery-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="delivery-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">Do you ship internationally?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Yes, we ship to most countries worldwide. Shipping costs and delivery times vary by destination. International customers are responsible for any customs duties or import taxes.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="delivery-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="delivery-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">What if I'm not home for delivery?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            The carrier will leave a notice with instructions for redelivery or pickup. You can also contact the carrier directly to arrange an alternative delivery time or location.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="radio" name="faq-tab-{{ ai_gen_id }}" id="tab-order-{{ ai_gen_id }}" class="ai-faq-tabs__tab-input-{{ ai_gen_id }}">
+    <div class="ai-faq-tabs__content-{{ ai_gen_id }}">
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="order-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="order-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">How do I place an order?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Browse our collections, select your items and sizes, add them to your cart, and proceed to checkout. You can shop as a guest or create an account for faster future purchases and order tracking.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="order-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="order-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">Can I modify my order after placing it?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Contact us immediately if you need to modify your order. We'll do our best to accommodate changes, but once an order is processed and shipped, modifications are no longer possible.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="order-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="order-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">What payment methods do you accept?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            We accept all major credit cards, PayPal, Apple Pay, Google Pay, and other secure payment methods. All transactions are encrypted and processed through secure payment gateways.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="order-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="order-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">Is my payment information secure?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Absolutely. We use industry-standard SSL encryption and PCI-compliant payment processors. Your payment information is never stored on our servers and is transmitted securely.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="radio" name="faq-tab-{{ ai_gen_id }}" id="tab-received-{{ ai_gen_id }}" class="ai-faq-tabs__tab-input-{{ ai_gen_id }}">
+    <div class="ai-faq-tabs__content-{{ ai_gen_id }}">
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="received-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="received-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">What should I do when my order arrives?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Inspect your package immediately upon arrival. Check that all items are correct and undamaged. If there are any issues, contact us within 48 hours with photos for fastest resolution.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="received-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="received-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">My item arrived damaged. What now?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            We apologize for any damage. Please email us immediately with your order number and clear photos of the damaged item and packaging. We'll arrange a replacement or full refund right away.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="received-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="received-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">I received the wrong item. How do I fix this?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Contact our customer service team with your order number and details of the incorrect item. We'll send the correct item immediately and provide a prepaid return label for the wrong item.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="received-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="received-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">An item is missing from my order. What should I do?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Check your order confirmation to verify what was ordered. If an item is genuinely missing, contact us with your order number and we'll investigate and ship the missing item at no additional cost.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="radio" name="faq-tab-{{ ai_gen_id }}" id="tab-exchanges-{{ ai_gen_id }}" class="ai-faq-tabs__tab-input-{{ ai_gen_id }}">
+    <div class="ai-faq-tabs__content-{{ ai_gen_id }}">
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="exchanges-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="exchanges-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">What is your return policy?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            We accept returns within 30 days of delivery. Items must be unworn, unwashed, and in original condition with tags attached. Sale items and final sale pieces are not eligible for return.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="exchanges-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="exchanges-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">How do I initiate a return or exchange?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Log into your account and go to your order history, or contact our customer service team. We'll provide a return authorization and prepaid shipping label. Pack items securely and ship within 7 days.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="exchanges-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="exchanges-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">Can I exchange for a different size or color?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Yes, exchanges are available for different sizes or colors of the same item, subject to availability. Contact us to arrange an exchange and we'll prioritize shipping your new item.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="exchanges-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="exchanges-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">When will I receive my refund?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Refunds are processed within 5-7 business days of receiving your return. The refund will be issued to your original payment method. Please allow additional time for your bank to process the credit.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="radio" name="faq-tab-{{ ai_gen_id }}" id="tab-general-{{ ai_gen_id }}" class="ai-faq-tabs__tab-input-{{ ai_gen_id }}">
+    <div class="ai-faq-tabs__content-{{ ai_gen_id }}">
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="general-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="general-q1-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">How can I contact customer service?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Reach us via email, phone, or live chat during business hours. Our team typically responds within 24 hours. For urgent matters, use our live chat feature for immediate assistance.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="general-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="general-q2-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">Do you have a physical store?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            We're primarily an online retailer, but we do have select flagship locations and pop-up shops. Check our store locator page for current physical retail locations and upcoming events.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="general-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="general-q3-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">How do I sign up for your newsletter?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Enter your email in the newsletter signup box at the bottom of our website. Subscribers receive exclusive access to new collections, special promotions, and styling tips delivered to your inbox.
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-faq-tabs__accordion-item-{{ ai_gen_id }}">
+        <input type="checkbox" id="general-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-input-{{ ai_gen_id }}">
+        <label for="general-q4-{{ ai_gen_id }}" class="ai-faq-tabs__accordion-question-{{ ai_gen_id }}">
+          <h3 class="ai-faq-tabs__question-text-{{ ai_gen_id }}">Do you offer gift cards?</h3>
+          <span class="ai-faq-tabs__accordion-icon-{{ ai_gen_id }}"></span>
+        </label>
+        <div class="ai-faq-tabs__accordion-answer-{{ ai_gen_id }}">
+          <div class="ai-faq-tabs__answer-content-{{ ai_gen_id }}">
+            Yes, digital gift cards are available in various denominations. They're delivered instantly via email and can be used for any purchase on our website. Gift cards never expire.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</faq-tabs-{{ ai_gen_id }}>
+
+{% schema %}
+{
+  "name": "Tabbed FAQ",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max content width",
+      "min": 600,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "default": 1000
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "label": "Bottom spacing",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Tab labels"
+    },
+    {
+      "type": "text",
+      "id": "tab_1_label",
+      "label": "Tab 1 label",
+      "default": "Product"
+    },
+    {
+      "type": "text",
+      "id": "tab_2_label",
+      "label": "Tab 2 label",
+      "default": "Delivery"
+    },
+    {
+      "type": "text",
+      "id": "tab_3_label",
+      "label": "Tab 3 label",
+      "default": "Order"
+    },
+    {
+      "type": "text",
+      "id": "tab_4_label",
+      "label": "Tab 4 label",
+      "default": "Order Received"
+    },
+    {
+      "type": "text",
+      "id": "tab_5_label",
+      "label": "Tab 5 label",
+      "default": "Exchanges"
+    },
+    {
+      "type": "text",
+      "id": "tab_6_label",
+      "label": "Tab 6 label",
+      "default": "General FAQs"
+    },
+    {
+      "type": "header",
+      "content": "Tab style"
+    },
+    {
+      "type": "range",
+      "id": "tab_gap",
+      "label": "Gap between tabs",
+      "min": 4,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "tab_content_gap",
+      "label": "Gap to content",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "tab_padding_vertical",
+      "label": "Vertical padding",
+      "min": 6,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "tab_padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "tab_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "tab_font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "tab_font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "select",
+      "id": "tab_text_transform",
+      "label": "Text transform",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "lowercase", "label": "Lowercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "tab_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 3,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "tab_border_width",
+      "label": "Border width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "tab_border_color",
+      "label": "Border color",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "color",
+      "id": "tab_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "tab_text_color",
+      "label": "Text color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "tab_hover_bg_color",
+      "label": "Hover background",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "color",
+      "id": "tab_hover_text_color",
+      "label": "Hover text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_bg_color",
+      "label": "Active background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_text_color",
+      "label": "Active text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Content area"
+    },
+    {
+      "type": "color",
+      "id": "content_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "content_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "label": "Padding",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Accordion items"
+    },
+    {
+      "type": "range",
+      "id": "accordion_gap",
+      "label": "Gap between items",
+      "min": 4,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "accordion_border_width",
+      "label": "Border width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "accordion_border_color",
+      "label": "Border color",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "range",
+      "id": "accordion_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Question"
+    },
+    {
+      "type": "range",
+      "id": "question_padding",
+      "label": "Padding",
+      "min": 10,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "question_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "question_hover_bg_color",
+      "label": "Hover background",
+      "default": "#f9f9f9"
+    },
+    {
+      "type": "range",
+      "id": "question_font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "question_font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "select",
+      "id": "question_text_transform",
+      "label": "Text transform",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "lowercase", "label": "Lowercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "question_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 2,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0.5
+    },
+    {
+      "type": "color",
+      "id": "question_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Answer"
+    },
+    {
+      "type": "range",
+      "id": "answer_padding",
+      "label": "Padding",
+      "min": 10,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "answer_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "answer_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "answer_color",
+      "label": "Text color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Icon"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Size",
+      "min": 16,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Tabbed FAQ"
+    }
+  ]
+}
+{% endschema %}

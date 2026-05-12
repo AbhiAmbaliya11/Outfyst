@@ -1,0 +1,297 @@
+{% style %}
+  .fitness-text-section-{{ section.id }} {
+    background: {{ section.settings.bg_color }};
+    padding: {{ section.settings.desktop_padding_top }}px 20px {{ section.settings.desktop_padding_bottom }}px;
+    text-align: center;
+  }
+
+  .fitness-text-section-{{ section.id }} .fitness-small-text {
+    color: {{ section.settings.small_text_color }};
+    font-size: {{ section.settings.small_text_size }}px;
+    letter-spacing: {{ section.settings.small_letter_spacing }}px;
+    text-transform: uppercase;
+    margin-bottom: {{ section.settings.small_text_spacing }}px;
+    font-weight: {{ section.settings.small_text_weight }};
+  }
+
+  .fitness-text-section-{{ section.id }} .fitness-main-heading {
+    max-width: {{ section.settings.content_width }}px;
+    margin: 0 auto;
+    font-size: {{ section.settings.heading_size }}px;
+    line-height: {{ section.settings.heading_line_height }};
+    font-weight: {{ section.settings.heading_weight }};
+    text-transform: uppercase;
+    letter-spacing: {{ section.settings.heading_letter_spacing }}px;
+  }
+
+  .fitness-text-section-{{ section.id }} .white-text {
+    color: {{ section.settings.primary_text_color }};
+    font-family: "Archivo Black", sans-serif;
+  }
+
+  .fitness-text-section-{{ section.id }} .red-text {
+    color: {{ section.settings.highlight_text_color }};
+    font-family: "Archivo Black", sans-serif;
+  }
+
+  @media screen and (max-width: 768px) {
+    .fitness-text-section-{{ section.id }} {
+      padding: {{ section.settings.mobile_padding_top }}px 15px {{ section.settings.mobile_padding_bottom }}px;
+    }
+
+    .fitness-text-section-{{ section.id }} .fitness-main-heading {
+      font-size: {{ section.settings.mobile_heading_size }}px;
+      line-height: {{ section.settings.mobile_line_height }};
+    }
+
+    .fitness-text-section-{{ section.id }} .fitness-small-text {
+      font-size: {{ section.settings.mobile_small_text_size }}px;
+      letter-spacing: {{ section.settings.mobile_small_letter_spacing }}px;
+    }
+  }
+  .fitness-text-section-template--20162184413320__custom_text_prwWzN{
+    padding: 120px 20px !important;
+  }
+{% endstyle %}
+
+<section class="fitness-text-section-{{ section.id }}">
+  {% if section.settings.small_text != blank %}
+    <div class="fitness-small-text">
+      {{ section.settings.small_text }}
+    </div>
+  {% endif %}
+
+  <h2 class="fitness-main-heading">
+    <span class="white-text">{{ section.settings.line_1 }}</span><br>
+    <span class="white-text">{{ section.settings.line_2_before }}</span>
+    <span class="red-text">{{ section.settings.line_2_highlight }}</span><br>
+    <span class="white-text">{{ section.settings.line_3_before }}</span>
+    <span class="red-text">{{ section.settings.line_3_highlight }}</span>
+  </h2>
+</section>
+
+{% schema %}
+{
+  "name": "Custom Text",
+  "settings": [
+    {
+      "type": "text",
+      "id": "small_text",
+      "label": "Small Top Text",
+      "default": "-- Earn Your Fit --"
+    },
+    {
+      "type": "text",
+      "id": "line_1",
+      "label": "Heading Line 1",
+      "default": "Clothes For Those"
+    },
+    {
+      "type": "text",
+      "id": "line_2_before",
+      "label": "Heading Line 2 Normal Text",
+      "default": "Who"
+    },
+    {
+      "type": "text",
+      "id": "line_2_highlight",
+      "label": "Heading Line 2 Highlight Text",
+      "default": "Show Up"
+    },
+    {
+      "type": "text",
+      "id": "line_3_before",
+      "label": "Heading Line 3 Normal Text",
+      "default": "And"
+    },
+    {
+      "type": "text",
+      "id": "line_3_highlight",
+      "label": "Heading Line 3 Highlight Text",
+      "default": "Do The Work."
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#080808"
+    },
+    {
+      "type": "color",
+      "id": "primary_text_color",
+      "label": "Primary Text Color",
+      "default": "#f4f1ea"
+    },
+    {
+      "type": "color",
+      "id": "highlight_text_color",
+      "label": "Highlight Text Color",
+      "default": "#9b0d18"
+    },
+    {
+      "type": "color",
+      "id": "small_text_color",
+      "label": "Small Text Color",
+      "default": "#9b0d18"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content Width",
+      "min": 600,
+      "max": 1600,
+      "step": 50,
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Desktop Heading Size",
+      "min": 40,
+      "max": 120,
+      "step": 2,
+      "default": 88
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_size",
+      "label": "Mobile Heading Size",
+      "min": 28,
+      "max": 70,
+      "step": 1,
+      "default": 42
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Heading Font Weight",
+      "default": "900",
+      "options": [
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra Bold" },
+        { "value": "900", "label": "Black" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing",
+      "label": "Heading Letter Spacing",
+      "min": -3,
+      "max": 8,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "text",
+      "id": "heading_line_height",
+      "label": "Desktop Line Height",
+      "default": "1.1"
+    },
+    {
+      "type": "text",
+      "id": "mobile_line_height",
+      "label": "Mobile Line Height",
+      "default": "1.15"
+    },
+    {
+      "type": "range",
+      "id": "small_text_size",
+      "label": "Desktop Small Text Size",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "mobile_small_text_size",
+      "label": "Mobile Small Text Size",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "small_letter_spacing",
+      "label": "Small Text Letter Spacing",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "mobile_small_letter_spacing",
+      "label": "Mobile Small Letter Spacing",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "select",
+      "id": "small_text_weight",
+      "label": "Small Text Font Weight",
+      "default": "500",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "small_text_spacing",
+      "label": "Small Text Bottom Spacing",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "desktop_padding_top",
+      "label": "Desktop Padding Top",
+      "min": 40,
+      "max": 250,
+      "step": 5,
+      "default": 140
+    },
+    {
+      "type": "range",
+      "id": "desktop_padding_bottom",
+      "label": "Desktop Padding Bottom",
+      "min": 40,
+      "max": 250,
+      "step": 5,
+      "default": 130
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "label": "Mobile Padding Top",
+      "min": 30,
+      "max": 160,
+      "step": 5,
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "label": "Mobile Padding Bottom",
+      "min": 30,
+      "max": 160,
+      "step": 5,
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Text"
+    }
+  ]
+}
+{% endschema %}

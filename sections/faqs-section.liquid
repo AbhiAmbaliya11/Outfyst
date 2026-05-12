@@ -1,0 +1,552 @@
+{% comment %}
+  FAQ Tabs Section - Fully Editable via Schema
+  Fix: qa_item blocks match their tab using the real Shopify block ID (tab.id),
+       NOT a fragile counter — so ALL tabs show their content correctly.
+{% endcomment %}
+
+<style>
+  .faq-section {
+    background: {{ section.settings.section_bg_color }};
+    padding: {{ section.settings.section_padding_top }}px 0 {{ section.settings.section_padding_bottom }}px;
+    font-family: {{ section.settings.font_family }};
+  }
+
+  .faq-section__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .faq-section__heading {
+    text-align: center;
+    font-size: {{ section.settings.heading_size }}px;
+    color: {{ section.settings.heading_color }};
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ---- TAB NAV ---- */
+  .faq-tabs__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+    justify-content: center;
+  }
+
+  .faq-tabs__btn {
+    padding: 12px 24px;
+    background: {{ section.settings.tab_inactive_bg }};
+    color: {{ section.settings.tab_inactive_color }};
+    border: none;
+    border-radius: {{ section.settings.tab_border_radius }}px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+
+  .faq-tabs__btn:hover {
+    background: {{ section.settings.tab_hover_bg }};
+    color: {{ section.settings.tab_hover_color }};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .faq-tabs__btn.active {
+    background: {{ section.settings.tab_active_bg }};
+    color: {{ section.settings.tab_active_color }};
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    transform: translateY(-1px);
+  }
+
+  /* ---- PANELS ---- */
+  .faq-tabs__panel {
+    display: none;
+    animation: faqFadeUp 0.35s ease forwards;
+  }
+
+  .faq-tabs__panel.active { display: block; }
+
+  @keyframes faqFadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- ACCORDION ---- */
+  .faq-accordion__item {
+    background: {{ section.settings.accordion_bg }};
+    border-radius: {{ section.settings.accordion_border_radius }}px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    border: 1px solid {{ section.settings.accordion_border_color }};
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+  }
+
+  .faq-accordion__item:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+  }
+
+  .faq-accordion__trigger {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    gap: 16px;
+  }
+
+  .faq-accordion__question {
+    font-size: {{ section.settings.question_font_size }}px;
+    font-weight: 700;
+    color: {{ section.settings.question_color }};
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .faq-accordion__icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid {{ section.settings.icon_color }};
+    position: relative;
+    transition: transform 0.35s ease, background 0.3s ease, border-color 0.3s ease;
+  }
+
+  .faq-accordion__icon::before,
+  .faq-accordion__icon::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    background: {{ section.settings.icon_color }};
+    border-radius: 2px;
+    transition: background 0.3s ease, transform 0.35s ease;
+  }
+
+  .faq-accordion__icon::before {
+    width: 10px; height: 2px;
+    transform: translate(-50%, -50%);
+  }
+
+  .faq-accordion__icon::after {
+    width: 2px; height: 10px;
+    transform: translate(-50%, -50%);
+  }
+
+  .faq-accordion__item.open .faq-accordion__icon {
+    background: {{ section.settings.icon_active_bg }};
+    border-color: {{ section.settings.icon_active_bg }};
+    transform: rotate(45deg);
+  }
+
+  .faq-accordion__item.open .faq-accordion__icon::before,
+  .faq-accordion__item.open .faq-accordion__icon::after {
+    background: {{ section.settings.icon_active_color }};
+  }
+
+  .faq-accordion__body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .faq-accordion__item.open .faq-accordion__body { max-height: 800px; }
+
+  .faq-accordion__answer {
+    padding: 16px 24px 20px;
+    font-size: {{ section.settings.answer_font_size }}px;
+    color: {{ section.settings.answer_color }};
+    line-height: 1.7;
+    border-top: 1px solid {{ section.settings.accordion_border_color }};
+  }
+
+  .faq-empty-note {
+    color: #999;
+    font-size: 14px;
+    padding: 10px 0 20px;
+    font-style: italic;
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 768px) {
+    .faq-tabs__btn { padding: 10px 16px; font-size: 11px; }
+    .faq-tabs__nav{ display: grid; grid-template-columns: 1fr 1fr; }
+    .faq-section__heading { font-size: {{ section.settings.heading_size | minus: 8 }}px; }
+    .faq-accordion__trigger { padding: 16px 18px; }
+    .faq-accordion__answer { padding: 14px 18px 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .faq-tabs__btn { padding: 9px 13px; font-size: 10px; }
+  }
+</style>
+
+<section class="faq-section" id="faq-section-{{ section.id }}">
+  <div class="faq-section__container">
+
+    {% if section.settings.section_heading != blank %}
+      <h2 class="faq-section__heading">{{ section.settings.section_heading }}</h2>
+    {% endif %}
+
+    {%- comment -%} Separate blocks by type {%- endcomment -%}
+    {%- assign all_tabs = section.blocks | where: "type", "tab" -%}
+    {%- assign all_qas  = section.blocks | where: "type", "qa_item" -%}
+
+    <!-- TAB BUTTONS -->
+    <div class="faq-tabs__nav" role="tablist">
+      {%- for tab in all_tabs -%}
+        <button
+          class="faq-tabs__btn{% if forloop.first %} active{% endif %}"
+          role="tab"
+          aria-selected="{{ forloop.first }}"
+          data-tab-id="{{ tab.id }}"
+          {{ tab.shopify_attributes }}
+        >
+          {{ tab.settings.tab_label }}
+        </button>
+      {%- endfor -%}
+    </div>
+
+    <!-- TAB PANELS -->
+    <div class="faq-tabs__panels">
+      {%- for tab in all_tabs -%}
+        <div
+          class="faq-tabs__panel{% if forloop.first %} active{% endif %}"
+          id="faq-panel-{{ tab.id }}"
+          role="tabpanel"
+          {{ tab.shopify_attributes }}
+        >
+          {%- assign matched = false -%}
+          {%- for qa in all_qas -%}
+            {%- if qa.settings.parent_tab_id == tab.id -%}
+              {%- assign matched = true -%}
+              <div class="faq-accordion__item" {{ qa.shopify_attributes }}>
+                <button class="faq-accordion__trigger" aria-expanded="false">
+                  <span class="faq-accordion__question">{{ qa.settings.question }}</span>
+                  <span class="faq-accordion__icon" aria-hidden="true"></span>
+                </button>
+                <div class="faq-accordion__body">
+                  <div class="faq-accordion__answer">{{ qa.settings.answer }}</div>
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+
+          {%- unless matched -%}
+            <p class="faq-empty-note">
+              No FAQ items yet for this tab.<br>
+              Add a <strong>FAQ Item</strong> block → paste Tab ID: <code>{{ tab.id }}</code> into the "Tab ID" field.
+            </p>
+          {%- endunless -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function () {
+  var section = document.getElementById('faq-section-{{ section.id }}');
+  if (!section) return;
+
+  /* ── TABS ── */
+  var btns   = section.querySelectorAll('.faq-tabs__btn');
+  var panels = section.querySelectorAll('.faq-tabs__panel');
+
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = this.getAttribute('data-tab-id');
+
+      btns.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+      panels.forEach(function (p) { p.classList.remove('active'); });
+
+      this.classList.add('active');
+      this.setAttribute('aria-selected', 'true');
+
+      var panel = document.getElementById('faq-panel-' + id);
+      if (panel) panel.classList.add('active');
+    });
+  });
+
+  /* ── ACCORDION (event delegation) ── */
+  section.addEventListener('click', function (e) {
+    var trigger = e.target.closest('.faq-accordion__trigger');
+    if (!trigger) return;
+
+    var item  = trigger.closest('.faq-accordion__item');
+    var panel = item.closest('.faq-tabs__panel');
+    var open  = item.classList.contains('open');
+
+    panel.querySelectorAll('.faq-accordion__item').forEach(function (el) {
+      el.classList.remove('open');
+      el.querySelector('.faq-accordion__trigger').setAttribute('aria-expanded', 'false');
+    });
+
+    if (!open) {
+      item.classList.add('open');
+      trigger.setAttribute('aria-expanded', 'true');
+    }
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "FAQ Tabs",
+  "tag": "section",
+  "class": "faq-tabs-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "Section Heading",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading Font Size (px)",
+      "min": 18,
+      "max": 48,
+      "step": 2,
+      "default": 28
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Padding Top (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Padding Bottom (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "select",
+      "id": "font_family",
+      "label": "Font Family",
+      "options": [
+        { "value": "inherit", "label": "Theme Default" },
+        { "value": "'Helvetica Neue', Helvetica, Arial, sans-serif", "label": "Helvetica Neue" },
+        { "value": "Georgia, 'Times New Roman', serif", "label": "Georgia" }
+      ],
+      "default": "inherit"
+    },
+    {
+      "type": "header",
+      "content": "Tab Button Styles"
+    },
+    {
+      "type": "color",
+      "id": "tab_inactive_bg",
+      "label": "Inactive Tab Background",
+      "default": "#d6d5d3"
+    },
+    {
+      "type": "color",
+      "id": "tab_inactive_color",
+      "label": "Inactive Tab Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_bg",
+      "label": "Active Tab Background",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_color",
+      "label": "Active Tab Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "tab_hover_bg",
+      "label": "Hover Tab Background",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "tab_hover_color",
+      "label": "Hover Tab Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "tab_border_radius",
+      "label": "Tab Border Radius (px)",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Accordion Styles"
+    },
+    {
+      "type": "color",
+      "id": "accordion_bg",
+      "label": "Accordion Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accordion_border_color",
+      "label": "Accordion Border Color",
+      "default": "#e8e8e8"
+    },
+    {
+      "type": "range",
+      "id": "accordion_border_radius",
+      "label": "Accordion Border Radius (px)",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "question_color",
+      "label": "Question Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "question_font_size",
+      "label": "Question Font Size (px)",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "answer_color",
+      "label": "Answer Text Color",
+      "default": "#555555"
+    },
+    {
+      "type": "range",
+      "id": "answer_font_size",
+      "label": "Answer Font Size (px)",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Icon Styles"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon Color (Closed)",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "icon_active_bg",
+      "label": "Icon Background (Open)",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "icon_active_color",
+      "label": "Icon Color (Open)",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "📂 Tab Category",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_label",
+          "label": "Tab Label",
+          "default": "New Tab"
+        }
+      ]
+    },
+    {
+      "type": "qa_item",
+      "name": "❓ FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "parent_tab_id",
+          "label": "Tab ID",
+          "info": "Click the Tab block you want this FAQ to appear under → copy the Block ID shown at the bottom of that block → paste it here."
+        },
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Enter your question here"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Enter your answer here.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ Tabs",
+      "blocks": [
+        { "type": "tab", "settings": { "tab_label": "Product" } },
+        { "type": "tab", "settings": { "tab_label": "Delivery" } },
+        { "type": "tab", "settings": { "tab_label": "Order" } },
+        { "type": "tab", "settings": { "tab_label": "Order Received" } },
+        { "type": "tab", "settings": { "tab_label": "Exchanges" } },
+        { "type": "tab", "settings": { "tab_label": "General FAQs" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

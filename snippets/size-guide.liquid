@@ -1,0 +1,286 @@
+<!-- Size Guide Popup — fixed bottom-right, floats above page while scrolling -->
+<div id="size-guide-popup" class="size-guide-popup" role="dialog" aria-modal="true" aria-label="Size Guide" aria-hidden="true">
+  <div class="size-guide-header">
+    <span class="size-guide-title">Size guide</span>
+    <div class="size-guide-header-right">
+      <button type="button" class="size-guide-close-btn" onclick="closeSizeGuide()" aria-label="Close size guide">&times;</button>
+      <div class="size-guide-unit-toggle">
+        <button type="button" class="unit-btn active" id="btn-in" onclick="switchUnit('IN')">IN</button>
+        <button type="button" class="unit-btn" id="btn-cm" onclick="switchUnit('CM')">CM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IN Table -->
+  <div id="size-table-in" class="size-guide-table-wrap">
+    <table class="size-guide-table">
+      <thead>
+        <tr>
+          <th>Size</th>
+          <th>Chest</th>
+          <th>Shoulder</th>
+          <th>Length</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>XXXS</td><td>39</td><td>19.5</td><td>26.5</td></tr>
+        <tr><td>XXS</td><td>42</td><td>20</td><td>28</td></tr>
+        <tr><td>XS</td><td>44</td><td>20.5</td><td>28.5</td></tr>
+        <tr><td>S</td><td>46</td><td>21</td><td>29</td></tr>
+        <tr><td>M</td><td>48</td><td>21.5</td><td>29.5</td></tr>
+        <tr><td>L</td><td>50</td><td>22</td><td>30</td></tr>
+        <tr><td>XL</td><td>52</td><td>24.5</td><td>30</td></tr>
+        <tr><td>XXL</td><td>54</td><td>25</td><td>30.5</td></tr>
+        <tr><td>XXXL</td><td>56</td><td>25.75</td><td>31</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CM Table -->
+  <div id="size-table-cm" class="size-guide-table-wrap" style="display:none;">
+    <table class="size-guide-table">
+      <thead>
+        <tr>
+          <th>Size</th>
+          <th>Chest</th>
+          <th>Shoulder</th>
+          <th>Length</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>XXXS</td><td>99.06</td><td>49.53</td><td>67.31</td></tr>
+        <tr><td>XXS</td><td>106.68</td><td>50.8</td><td>71.12</td></tr>
+        <tr><td>XS</td><td>111.76</td><td>52.07</td><td>72.39</td></tr>
+        <tr><td>S</td><td>116.84</td><td>53.34</td><td>73.66</td></tr>
+        <tr><td>M</td><td>121.92</td><td>54.61</td><td>74.93</td></tr>
+        <tr><td>L</td><td>127</td><td>55.88</td><td>76.2</td></tr>
+        <tr><td>XL</td><td>132.2</td><td>60</td><td>76.2</td></tr>
+        <tr><td>XXL</td><td>137.16</td><td>63.5</td><td>77.44</td></tr>
+        <tr><td>XXXL</td><td>142.24</td><td>65</td><td>78.4</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  /* ── Size Guide Button ── */
+  .form__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .size-guide-btn {
+    margin-left: auto;
+    background: transparent;
+    padding: 4px 12px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    line-height: 1.4;
+    transition: border-color 0.2s, color 0.2s;
+    white-space: nowrap;
+    text-decoration: underline;
+  }
+
+  .size-guide-btn:hover {
+    border-color: #888;
+    color: #000;
+  }
+
+  /* ── Popup ── */
+  /* Hidden by default; shown with .is-open */
+  .size-guide-popup {
+    display: none;
+    position: absolute;
+    bottom: 24px;
+    top: 0;
+    width: 365px;
+    left:4px;
+    max-width: calc(100vw - 48px);
+    max-height: max-content;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 48px rgba(0, 0, 0, 0.18);
+    z-index: 9999;
+  }
+
+  .size-guide-popup.is-open {
+    display: block;
+    animation: sgSlideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes sgSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Header (sticky so it doesn't scroll away) ── */
+  .size-guide-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid #ebebeb;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .size-guide-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Header Right (X + Toggle) ── */
+  .size-guide-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .size-guide-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    color: #888;
+    cursor: pointer;
+    padding: 0 2px;
+    transition: color 0.15s;
+  }
+
+  .size-guide-close-btn:hover {
+    color: #111;
+  }
+
+  /* ── Unit Toggle ── */
+  .size-guide-unit-toggle {
+    display: flex;
+    background: #f2f2f2;
+    border-radius: 20px;
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .unit-btn {
+    background: transparent;
+    border: none;
+    border-radius: 16px;
+    padding: 4px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #888;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    line-height: 1.5;
+  }
+
+  .unit-btn.active {
+    background: #fff;
+    color: #111;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.10);
+  }
+
+  /* ── Table ── */
+  .size-guide-table-wrap {
+    overflow-x: auto;
+    padding: 8px 0 4px;
+  }
+
+  .size-guide-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    color: #222;
+  }
+
+  .size-guide-table th {
+    padding: 10px 18px;
+    text-align: center;
+    font-weight: 600;
+    color: #555;
+    font-size: 13px;
+    border-bottom: 1px solid #ebebeb;
+  }
+
+  .size-guide-table th:first-child,
+  .size-guide-table td:first-child {
+    text-align: left;
+    padding-left: 18px;
+  }
+
+  .size-guide-table td {
+    padding: 9px 18px;
+    text-align: center;
+    border-bottom: 1px solid #f4f4f4;
+    color: #333;
+  }
+
+  .size-guide-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .size-guide-table tbody tr:hover td {
+    background: #fafafa;
+  }
+
+  /* ── Mobile ── */
+  @media screen and (max-width: 749px) {
+    .size-guide-popup {
+      right: 0px;
+      bottom: 12px;
+      width: calc(100vw - 24px);
+      max-width: 100%;
+    }
+  }
+  .product-form__input--pill .form__label{
+    width: 100%;
+    display: flex;
+  }
+</style>
+
+<script>
+  function openSizeGuide() {
+    var popup = document.getElementById('size-guide-popup');
+    popup.classList.add('is-open');
+    popup.removeAttribute('aria-hidden');
+    document.addEventListener('keydown', handleSizeGuideEsc);
+  }
+
+  function closeSizeGuide() {
+    var popup = document.getElementById('size-guide-popup');
+    popup.classList.remove('is-open');
+    popup.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', handleSizeGuideEsc);
+  }
+
+  function handleSizeGuideEsc(event) {
+    if (event.key === 'Escape') closeSizeGuide();
+  }
+
+  function switchUnit(unit) {
+    var inTable = document.getElementById('size-table-in');
+    var cmTable = document.getElementById('size-table-cm');
+    var btnIn   = document.getElementById('btn-in');
+    var btnCm   = document.getElementById('btn-cm');
+
+    if (unit === 'IN') {
+      inTable.style.display = '';
+      cmTable.style.display = 'none';
+      btnIn.classList.add('active');
+      btnCm.classList.remove('active');
+    } else {
+      inTable.style.display = 'none';
+      cmTable.style.display = '';
+      btnCm.classList.add('active');
+      btnIn.classList.remove('active');
+    }
+  }
+</script>

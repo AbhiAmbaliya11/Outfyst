@@ -1,0 +1,351 @@
+{% comment %}
+  ============================================================
+  OUTFYST STORIES POPUP — snippets/outfyst-stories-popup.liquid
+  ------------------------------------------------------------
+  RENDER IN header.liquid (just before </header>):
+    {% render 'outfyst-stories-popup', blocks: section.blocks %}
+  ============================================================
+{% endcomment %}
+
+{% comment %} Filter only story-type blocks {% endcomment %}
+{%- assign story_blocks = blocks | where: 'type', 'story' -%}
+
+{%- if story_blocks.size > 0 -%}
+
+<div
+  id="outfyst-stories-popup"
+  class="outfyst-stories-popup"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Stories"
+  aria-hidden="true"
+>
+  <div class="osp-progress-track" id="osp-progress-track"></div>
+
+  <div class="osp-header">
+    <span class="osp-title" id="osp-title"></span>
+    <div class="osp-controls">
+      <button class="osp-ctrl-btn" id="osp-pause-btn" aria-label="Pause">
+        <svg class="osp-ic osp-ic-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="5" y="3" width="4.5" height="18" rx="1.5"/>
+          <rect x="14.5" y="3" width="4.5" height="18" rx="1.5"/>
+        </svg>
+        <svg class="osp-ic osp-ic-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 4.5l14 7.5-14 7.5V4.5z"/>
+        </svg>
+      </button>
+      <button class="osp-ctrl-btn" id="osp-close-btn" aria-label="Close stories">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="osp-image-wrap">
+    <img id="osp-img" class="osp-img" src="" alt="" draggable="false">
+    <div class="osp-shimmer" id="osp-shimmer"></div>
+  </div>
+
+  <div class="osp-nav-zones">
+    <button class="osp-zone osp-zone--prev" id="osp-prev" aria-label="Previous story" tabindex="0"></button>
+    <button class="osp-zone osp-zone--next" id="osp-next" aria-label="Next story"     tabindex="0"></button>
+  </div>
+
+  <div class="osp-footer">
+    <a id="osp-shop-link" href="#" class="osp-shop-btn">
+      <span id="osp-shop-label">Shop Now</span>
+    </a>
+  </div>
+</div>
+
+<style>
+@media (min-width: 991px) {
+  .outfyst-stories-popup { display: none !important; }
+}
+@media (max-width: 990px) {
+  .outfyst-stories-popup {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    z-index: 2147483647; background: #000;
+    display: flex; flex-direction: column; overflow: hidden;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transform: scale(0.96);
+    transition: opacity 0.26s cubic-bezier(.4,0,.2,1),
+                visibility 0.26s cubic-bezier(.4,0,.2,1),
+                transform 0.26s cubic-bezier(.4,0,.2,1);
+  }
+  .outfyst-stories-popup.is-open {
+    opacity: 1; visibility: visible; pointer-events: auto; transform: scale(1);
+  }
+  .osp-progress-track {
+    position: absolute; top: env(safe-area-inset-top, 0px); left: 0; right: 0;
+    z-index: 20; display: flex; gap: 4px; padding: 10px 10px 0;
+  }
+
+
+.osp-bar {
+  flex: 1; height: 3px;
+  background: rgba(255,255,255,0.18);   /* remaining = dim */
+  border-radius: 99px; overflow: hidden;
+}
+
+ .osp-bar-fill {
+  height: 100%; width: 0%;
+  display: block !important;
+  background: #c8622a;                   /* filling = brand amber */
+  border-radius: 99px;
+  will-change: width;
+  transform: translateZ(0);
+}
+
+  .osp-bar-fill.done {
+  width: 100%;
+  background: rgba(255,255,255,0.55);    /* completed = dim white */
+}
+
+  .osp-header {
+    position: absolute; top: calc(env(safe-area-inset-top, 0px) + 22px);
+    left: 0; right: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 12px;
+  }
+  .osp-title {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #c8622a;
+    font-family: var(--font-heading-family, 'Helvetica Neue', sans-serif);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+  }
+  .osp-controls { display: flex; align-items: center; gap: 4px; }
+  .osp-ctrl-btn {
+    background: none; border: none; color: #fff; width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    padding: 0; transition: background 0.15s;
+  }
+  .osp-ctrl-btn:active { background: rgba(255,255,255,0.15); }
+  .outfyst-stories-popup.is-playing .osp-ic-pause { display: block; }
+  .outfyst-stories-popup.is-playing .osp-ic-play  { display: none;  }
+  .outfyst-stories-popup.is-paused  .osp-ic-pause { display: none;  }
+  .outfyst-stories-popup.is-paused  .osp-ic-play  { display: block; }
+  .osp-ic-pause { display: block; }
+  .osp-ic-play  { display: none;  }
+  .osp-image-wrap { flex: 1; position: relative; overflow: hidden; background: #111; }
+  .osp-img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: block; user-select: none;
+    transition: opacity 0.25s ease;
+  }
+  .osp-img.loading { opacity: 0; }
+  .osp-shimmer {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.1) 50%,rgba(255,255,255,0.04) 100%);
+    background-size: 200% 100%; animation: osp-shimmer 1.4s infinite;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .osp-shimmer.visible { opacity: 1; }
+  @keyframes osp-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .osp-nav-zones {
+    position: absolute; top: 70px; bottom: 90px; left: 0; right: 0;
+    z-index: 10; display: flex;
+  }
+  .osp-zone {
+    flex: 1; background: transparent; border: none;
+    cursor: pointer; -webkit-tap-highlight-color: transparent; outline: none;
+  }
+  .osp-zone--prev:active { background: rgba(255,255,255,0.04); }
+  .osp-zone--next:active { background: rgba(255,255,255,0.04); }
+  .osp-footer {
+    position: absolute; bottom: 60px; left: 0; right: 0; z-index: 20;
+    padding: 28px 24px calc(20px + env(safe-area-inset-bottom, 0px));
+    display: flex; justify-content: center; align-items: center;
+    {% comment %} background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%); {% endcomment %}
+    pointer-events: none;
+  }
+  .osp-shop-btn {
+    pointer-events: auto; display: inline-flex; align-items: center; gap: 6px;
+    padding: 11px 32px; color: #fff; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+    border: 1.5px solid rgba(255,255,255,0.75); border-radius: 2px;
+    font-family: var(--font-heading-family, 'Helvetica Neue', sans-serif);
+    background: transparent; -webkit-tap-highlight-color: transparent;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+  }
+  .osp-shop-btn:hover, .osp-shop-btn:focus { background: #fff; color: #000; border-color: #fff; }
+  .osp-shop-btn:active { background: rgba(255,255,255,0.88); color: #000; }
+}
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     STORIES — injected from Shopify theme editor blocks
+     Each property maps directly to the block schema settings.
+     ============================================================ */
+  var STORIES = [
+    {%- for block in story_blocks -%}
+    {
+      title:     {{ block.settings.title     | default: ''         | json }},
+      image:     {%- if block.settings.image -%}
+                   {{ block.settings.image | image_url: width: 1080 | json }}
+                 {%- else -%}
+                   ''
+                 {%- endif -%},
+      shopUrl:   {{ block.settings.shop_url   | default: ''         | json }},
+      shopLabel: {{ block.settings.shop_label | default: 'Shop Now' | json }},
+      duration:  {{ block.settings.duration   | default: 5 | times: 1000 }}
+    }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ];
+
+  if (!STORIES.length) return;
+
+  var popup       = document.getElementById('outfyst-stories-popup');
+  var track       = document.getElementById('osp-progress-track');
+  var titleEl     = document.getElementById('osp-title');
+  var imgEl       = document.getElementById('osp-img');
+  var shimmerEl   = document.getElementById('osp-shimmer');
+  var shopLink    = document.getElementById('osp-shop-link');
+  var shopLabelEl = document.getElementById('osp-shop-label');
+  var pauseBtn    = document.getElementById('osp-pause-btn');
+  var closeBtn    = document.getElementById('osp-close-btn');
+  var prevBtn     = document.getElementById('osp-prev');
+  var nextBtn     = document.getElementById('osp-next');
+  var openTrigger = document.querySelector('[data-stories-open="stories-popup"]');
+
+  if (!popup || !openTrigger) return;
+
+  var currentIndex = 0, isPaused = false, rafId = null, startTime = null, elapsed = 0;
+
+var barFills = [];   /* ADD this var at top with other state vars */
+
+function buildBars() {
+  track.innerHTML = '';
+  barFills = [];
+  STORIES.forEach(function () {
+    var bar  = document.createElement('div'); bar.className = 'osp-bar';
+    var fill = document.createElement('div'); fill.className = 'osp-bar-fill';
+    bar.appendChild(fill); track.appendChild(bar);
+    barFills.push(fill);   /* cache reference directly */
+  });
+}
+
+  function fills() { return track.querySelectorAll('.osp-bar-fill'); }
+
+  function loadStory(index) {
+    stopProgress();
+    currentIndex = Math.max(0, Math.min(index, STORIES.length - 1));
+    elapsed = 0;
+    var s = STORIES[currentIndex];
+    titleEl.textContent     = s.title     || '';
+    shopLink.href           = s.shopUrl   || '#';
+    shopLabelEl.textContent = s.shopLabel || 'Shop Now';
+    imgEl.classList.add('loading');
+    shimmerEl.classList.add('visible');
+    var newImg = new Image();
+    newImg.onload = function () {
+      imgEl.src = newImg.src; imgEl.alt = s.title || '';
+      imgEl.classList.remove('loading'); shimmerEl.classList.remove('visible');
+      if (!isPaused) startProgress();
+    };
+    newImg.onerror = function () {
+      imgEl.src = s.image;
+      imgEl.classList.remove('loading'); shimmerEl.classList.remove('visible');
+      if (!isPaused) startProgress();
+    };
+    newImg.src = s.image;
+    var fls = fills();
+   barFills.forEach(function (f, i) {
+  f.style.width = (i < currentIndex) ? '100%' : '0%';
+  f.classList.toggle('done', i < currentIndex);
+});
+  }
+
+ /* NEW startProgress ↓ */
+function startProgress() {
+  stopProgress();
+  var duration = STORIES[currentIndex].duration || 5000;
+  startTime = performance.now() - elapsed;
+  var fill = barFills[currentIndex];
+  if (!fill) return;
+  function tick(now) {
+    elapsed = now - startTime;
+    var pct = Math.min((elapsed / duration) * 100, 100);
+    fill.style.width = pct + '%';
+    if (elapsed >= duration) { fill.style.width = '100%'; goNext(); return; }
+    rafId = requestAnimationFrame(tick);
+  }
+  rafId = requestAnimationFrame(tick);
+}
+
+
+  function stopProgress() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+
+  function pause() {
+    if (isPaused) return; isPaused = true; stopProgress();
+    popup.classList.replace('is-playing', 'is-paused');
+  }
+  function play() {
+    if (!isPaused) return; isPaused = false;
+    popup.classList.replace('is-paused', 'is-playing'); startProgress();
+  }
+
+  function goPrev() { loadStory(currentIndex > 0 ? currentIndex - 1 : 0); }
+  function goNext() {
+    if (currentIndex < STORIES.length - 1) loadStory(currentIndex + 1); else closePopup();
+  }
+
+  function openPopup() {
+    buildBars(); isPaused = false; elapsed = 0; currentIndex = 0;
+    popup.setAttribute('aria-hidden', 'false');
+    popup.classList.add('is-open', 'is-playing'); popup.classList.remove('is-paused');
+    document.body.style.overflow = 'hidden'; loadStory(0);
+  }
+  function closePopup() {
+    stopProgress(); popup.setAttribute('aria-hidden', 'true');
+    popup.classList.remove('is-open', 'is-playing', 'is-paused');
+    document.body.style.overflow = ''; elapsed = 0; currentIndex = 0;
+    setTimeout(function () { imgEl.src = ''; }, 300);
+  }
+
+  openTrigger.addEventListener('click', openPopup);
+  closeBtn.addEventListener('click', closePopup);
+  pauseBtn.addEventListener('click', function (e) { e.stopPropagation(); isPaused ? play() : pause(); });
+  prevBtn.addEventListener('click',  function (e) { e.stopPropagation(); goPrev(); });
+  nextBtn.addEventListener('click',  function (e) { e.stopPropagation(); goNext(); });
+
+  document.addEventListener('keydown', function (e) {
+    if (!popup.classList.contains('is-open')) return;
+    switch (e.key) {
+      case 'Escape':     closePopup(); break;
+      case 'ArrowLeft':  goPrev();     break;
+      case 'ArrowRight': goNext();     break;
+      case ' ': e.preventDefault(); isPaused ? play() : pause(); break;
+    }
+  });
+
+  var touchStartX = 0, touchStartY = 0, holdTimer = null;
+  popup.addEventListener('touchstart', function (e) {
+    if (e.target.closest('.osp-ctrl-btn, .osp-shop-btn')) return;
+    touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
+    holdTimer = setTimeout(function () { pause(); }, 140);
+  }, { passive: true });
+  popup.addEventListener('touchend', function (e) {
+    if (e.target.closest('.osp-ctrl-btn, .osp-shop-btn')) return;
+    clearTimeout(holdTimer);
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy)) {
+      if (isPaused) play(); dx < 0 ? goNext() : goPrev();
+    } else { if (isPaused) play(); }
+  }, { passive: true });
+  popup.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+})();
+</script>
+
+{%- endif -%}

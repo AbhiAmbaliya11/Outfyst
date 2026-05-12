@@ -1,0 +1,370 @@
+{% doc %}
+  @prompt
+    Create a premium "About Us" Shopify section in Liquid with a clean luxury streetwear aesthetic.
+    
+    Section Layout: Full width section with a very light grey background (#f3f3f3). Two-column desktop layout: left side large featured image occupying ~50% width, right side vertically centered text content area with generous whitespace. Mobile responsive: stack image on top and text below.
+    
+    Left Image Area: Large portrait/lifestyle/storefront image filling container with object-fit: cover. Minimal modern appearance with subtle shadow. Premium editorial fashion brand feel.
+    
+    Right Content Area: Small centered heading "ABOUT US" - bold, uppercase, black, clean sans-serif. Multiple paragraphs with muted grey text, font size 15-16px, line-height 1.8. Text width constrained for readability. One bold subheading "About the Founders". Balanced luxurious spacing.
+    
+    Design Style: Minimal, sophisticated, editorial. Plenty of negative space. Modern sans-serif fonts. No borders or decorations. Soft neutral tones only.
+    
+    Technical Requirements: Complete Shopify Liquid section with HTML, schema, and CSS. Schema settings for: main image, heading, paragraph text, founder heading, founder text, background color, text color. Fully responsive. Clean semantic HTML. No external libraries.
+    
+    Spacing: Desktop padding 80px-120px. Gap between columns 60px. Image large and dominant. Content vertically centered on desktop.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-about-section-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.desktop_padding }}px 0;
+  }
+
+  .ai-about-container-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: {{ block.settings.column_gap }}px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .ai-about-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+  }
+
+  .ai-about-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .ai-about-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+    background-color: #e8e8e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .ai-about-image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    max-height: 400px;
+    opacity: 0.3;
+  }
+
+  .ai-about-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: #999;
+    text-align: center;
+    font-family: {{ block.settings.body_font.family }}, sans-serif;
+  }
+
+  .ai-about-content-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 40px;
+  }
+
+  .ai-about-heading-{{ ai_gen_id }} {
+    font-family: {{ block.settings.heading_font.family }}, sans-serif;
+    font-weight: {{ block.settings.heading_font.weight }};
+    font-size: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: {{ block.settings.heading_color }};
+    margin: 0 0 0px 0;
+    text-align: center;
+  }
+
+  .ai-about-text-wrapper-{{ ai_gen_id }} {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .ai-about-paragraph-{{ ai_gen_id }} {
+    font-family: {{ block.settings.body_font.family }}, sans-serif;
+    font-weight: {{ block.settings.body_font.weight }};
+    font-size: {{ block.settings.text_size }}px;
+    line-height: 1.8;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 24px 0;
+  }
+
+  .ai-about-paragraph-{{ ai_gen_id }}:last-child {
+    margin-bottom: 0;
+  }
+
+  .ai-about-subheading-{{ ai_gen_id }} {
+    font-family: {{ block.settings.heading_font.family }}, sans-serif;
+    font-weight: {{ block.settings.heading_font.weight }};
+    font-size: {{ block.settings.subheading_size }}px;
+    color: {{ block.settings.heading_color }};
+    margin: 40px 0 24px 0;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-about-section-{{ ai_gen_id }} {
+      padding: {{ block.settings.mobile_padding }}px 0;
+    }
+
+    .ai-about-container-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      padding: 0 20px;
+    }
+
+    .ai-about-image-wrapper-{{ ai_gen_id }} {
+      min-height: 400px;
+    }
+
+    .ai-about-image-placeholder-{{ ai_gen_id }} {
+      min-height: 400px;
+    }
+
+    .ai-about-content-{{ ai_gen_id }} {
+      padding: 0;
+    }
+
+    .ai-about-heading-{{ ai_gen_id }} {
+      font-size: 11px;
+      margin-bottom: 24px;
+    }
+
+    .ai-about-paragraph-{{ ai_gen_id }} {
+      font-size: {{ block.settings.text_size | times: 0.9 }}px;
+    }
+
+    .ai-about-subheading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subheading_size | times: 0.9 }}px;
+      margin-top: 32px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-about-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-about-container-{{ ai_gen_id }}">
+    <div class="ai-about-image-wrapper-{{ ai_gen_id }}">
+      {% if block.settings.featured_image %}
+        <img
+          src="{{ block.settings.featured_image | image_url: width: 1400 }}"
+          alt="{{ block.settings.featured_image.alt | escape }}"
+          loading="lazy"
+          width="{{ block.settings.featured_image.width }}"
+          height="{{ block.settings.featured_image.height }}"
+          class="ai-about-image-{{ ai_gen_id }}"
+        >
+      {% else %}
+        <div class="ai-about-image-placeholder-{{ ai_gen_id }}">
+          {{ 'lifestyle-1' | placeholder_svg_tag }}
+          <div class="ai-about-empty-state-{{ ai_gen_id }}">
+            Add your featured image
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ai-about-content-{{ ai_gen_id }}">
+      {% if block.settings.heading != blank %}
+        <h2 class="ai-about-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+      {% endif %}
+
+      <div class="ai-about-text-wrapper-{{ ai_gen_id }}">
+        {% if block.settings.paragraph_1 != blank %}
+          <div class="ai-about-paragraph-{{ ai_gen_id }}">{{ block.settings.paragraph_1 }}</div>
+        {% endif %}
+
+        {% if block.settings.paragraph_2 != blank %}
+          <div class="ai-about-paragraph-{{ ai_gen_id }}">{{ block.settings.paragraph_2 }}</div>
+        {% endif %}
+
+        {% if block.settings.subheading != blank %}
+          <h3 class="ai-about-subheading-{{ ai_gen_id }}">{{ block.settings.subheading }}</h3>
+        {% endif %}
+
+        {% if block.settings.paragraph_3 != blank %}
+          <div class="ai-about-paragraph-{{ ai_gen_id }}">{{ block.settings.paragraph_3 }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "About us",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image",
+      "label": "Featured image"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "ABOUT US"
+    },
+    {
+      "type": "richtext",
+      "id": "paragraph_1",
+      "label": "First paragraph",
+      "default": "<p>We are a premium fashion brand dedicated to creating timeless pieces that blend modern aesthetics with exceptional craftsmanship. Our journey began with a simple vision: to redefine contemporary streetwear through quality, design, and authenticity.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "paragraph_2",
+      "label": "Second paragraph",
+      "default": "<p>Every collection is thoughtfully curated to reflect the spirit of urban culture while maintaining a commitment to sustainable practices and ethical production. We believe fashion should be both expressive and responsible.</p>"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "About the Founders"
+    },
+    {
+      "type": "richtext",
+      "id": "paragraph_3",
+      "label": "Third paragraph",
+      "default": "<p>Founded by a collective of designers and creatives who share a passion for innovation, our brand represents a new generation of fashion-forward thinking. We're here to challenge conventions and inspire confidence through every piece we create.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Heading font",
+      "default": "archivo_black_n4"
+    },
+    {
+      "type": "font_picker",
+      "id": "body_font",
+      "label": "Body font",
+      "default": "manrope_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "label": "Subheading size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#f3f3f3"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "desktop_padding",
+      "label": "Desktop padding",
+      "min": 40,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding",
+      "label": "Mobile padding",
+      "min": 20,
+      "max": 80,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Column gap",
+      "min": 20,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "About us"
+    }
+  ]
+}
+{% endschema %}

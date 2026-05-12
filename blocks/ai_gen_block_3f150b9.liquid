@@ -1,0 +1,293 @@
+{% doc %}
+  @prompt
+    Create a fully customizable scrolling announcement bar section with the following features:
+    
+    - Infinite horizontal marquee/ticker scrolling text animation
+    - Multiple announcement items separated by a decorative diamond/dot separator (like "◆")
+    - Dark background (default: black #000000) with light text (default: white #FFFFFF)
+    - Example text items: "24H EARLY", "SHOT IN BOMBAY", "DROP 01 – LIVE NOW", "EARN YOUR FIT VOL. I", "MEMBER PRE-ACCESS"
+    - Smooth continuous left-to-right scroll with no gaps or jumps
+    
+    Fully editable schema settings:
+    - Background color picker
+    - Text color picker
+    - Scrolling speed / duration (range slider in seconds, e.g. 10s–60s)
+    - Font size (range slider)
+    - Text transform (uppercase toggle)
+    - Letter spacing
+    - Separator symbol (text input, default: "◆")
+    - Pause on hover toggle (yes/no)
+    - Multiple announcement text blocks (repeatable blocks via schema sections)
+    - Each block: text content field
+    
+    The section should duplicate the text content to create a seamless infinite loop effect using CSS animation (@keyframes marquee). No JavaScript required — pure CSS animation. Make it responsive and work on mobile too.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-announcement-bar-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background-color: {{ block.settings.background_color }};
+    color: {{ block.settings.text_color }};
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ai-announcement-bar-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    width: fit-content;
+    animation: ai-marquee-{{ ai_gen_id }} {{ block.settings.scroll_duration }}s linear infinite;
+    {% if block.settings.pause_on_hover %}
+      animation-play-state: running;
+    {% endif %}
+  }
+
+  {% if block.settings.pause_on_hover %}
+    .ai-announcement-bar-{{ ai_gen_id }}:hover .ai-announcement-bar-wrapper-{{ ai_gen_id }} {
+      animation-play-state: paused;
+    }
+  {% endif %}
+
+  .ai-announcement-bar-content-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    padding: 12px 0;
+  }
+
+  .ai-announcement-bar-item-{{ ai_gen_id }} {
+    font-size: {{ block.settings.font_size }}px;
+    letter-spacing: 0.22em;
+    {% if block.settings.text_uppercase %}
+      text-transform: uppercase;
+    {% endif %}
+    padding: 0 0px;
+    font-weight: 600;~
+  }
+
+  .ai-announcement-bar-separator-{{ ai_gen_id }} {
+    font-size: {{ block.settings.font_size }}px;
+    padding: 0 20px;
+    opacity: 0.7;
+  }
+
+  @keyframes ai-marquee-{{ ai_gen_id }} {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-announcement-bar-item-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.font_size }}px * 0.9);
+      padding: 0 15px;
+    }
+
+    .ai-announcement-bar-separator-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.font_size }}px * 0.9);
+      padding: 0 15px;
+    }
+  }
+{% endstyle %}
+
+<announcement-bar-{{ ai_gen_id }} class="ai-announcement-bar-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-announcement-bar-wrapper-{{ ai_gen_id }}">
+    <div class="ai-announcement-bar-content-{{ ai_gen_id }}">
+      {% if block.settings.announcement_1 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_1 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.announcement_2 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_2 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.announcement_3 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_3 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.announcement_4 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_4 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.announcement_5 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_5 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.announcement_6 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_6 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+    </div>
+    <div class="ai-announcement-bar-content-{{ ai_gen_id }}" aria-hidden="true">
+      {% if block.settings.announcement_1 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_1 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.announcement_2 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_2 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.announcement_3 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_3 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.announcement_4 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_4 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.announcement_5 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_5 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.announcement_6 != blank %}
+        <span class="ai-announcement-bar-item-{{ ai_gen_id }}">{{ block.settings.announcement_6 }}</span>
+        <span class="ai-announcement-bar-separator-{{ ai_gen_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+    </div>
+  </div>
+</announcement-bar-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class AnnouncementBar{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+    }
+    customElements.define('announcement-bar-{{ ai_gen_id }}', AnnouncementBar{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "tag": null,
+  "class": "announcement-bar-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Announcements"
+    },
+    {
+      "type": "text",
+      "id": "announcement_1",
+      "label": "Announcement 1",
+      "default": "24H EARLY"
+    },
+    {
+      "type": "text",
+      "id": "announcement_2",
+      "label": "Announcement 2",
+      "default": "SHOT IN BOMBAY"
+    },
+    {
+      "type": "text",
+      "id": "announcement_3",
+      "label": "Announcement 3",
+      "default": "DROP 01 – LIVE NOW"
+    },
+    {
+      "type": "text",
+      "id": "announcement_4",
+      "label": "Announcement 4",
+      "default": "EARN YOUR FIT VOL. I"
+    },
+    {
+      "type": "text",
+      "id": "announcement_5",
+      "label": "Announcement 5",
+      "default": "MEMBER PRE-ACCESS"
+    },
+    {
+      "type": "text",
+      "id": "announcement_6",
+      "label": "Announcement 6"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 14
+    },
+    {
+      "type": "checkbox",
+      "id": "text_uppercase",
+      "label": "Uppercase text",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Letter spacing",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "range",
+      "id": "scroll_duration",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "s",
+      "label": "Scroll duration",
+      "default": 30
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Separator"
+    },
+    {
+      "type": "text",
+      "id": "separator",
+      "label": "Separator symbol",
+      "default": "◆"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement bar"
+    }
+  ]
+}
+{% endschema %}

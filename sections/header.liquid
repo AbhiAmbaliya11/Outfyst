@@ -1,0 +1,1437 @@
+<link rel="stylesheet" href="{{ 'component-search.css' | asset_url }}" media="print" onload="this.media='all'">
+<link
+  rel="stylesheet"
+  href="{{ 'component-cart-notification.css' | asset_url }}"
+  media="print"
+  onload="this.media='all'"
+>
+
+{%- if settings.predictive_search_enabled -%}
+  <link rel="stylesheet" href="{{ 'component-price.css' | asset_url }}" media="print" onload="this.media='all'">
+{%- endif -%}
+
+
+<style>
+
+  :root {
+    --header-bg: #000000;
+    --header-border: rgba(255, 255, 255, 0.08);
+    --header-text: #ffffff;
+    --header-height-desktop: 64px;
+    --header-height-mobile: 56px;
+    --nav-underline-duration: 200ms;
+    --mobile-menu-duration: 300ms;
+    --nav-active-color: #c8102e;
+    --glass-bg: rgba(0, 0, 0, 0.58);
+    --glass-blur: blur(20px) saturate(160%);
+  }
+
+  .header-OUTFYST {
+    position: fixed;
+    top : 30px;
+    left: 0px;
+    right: 0px;
+    z-index: 55;
+    height: 64px;
+    background: rgba(18, 18, 18, 0.55);
+    backdrop-filter: blur(24px) saturate(160%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: rgba(0, 0, 0, 0.18) 0px 8px 24px, rgba(255, 255, 255, 0.18) 0px 1px 0px inset;
+  }
+
+  @media screen and (max-width: 990px) {
+  .header-OUTFYST {
+    top: 0 !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+  }
+}
+
+  /* ---- Reset Dawn header defaults ---- */
+  .section-header {
+    position: sticky !important;
+    top: 0;
+    z-index: 100;
+    background: transparent !important;
+    border-bottom: 0.5px solid transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition:
+      background 0.4s ease,
+      border-color 0.4s ease,
+      backdrop-filter 0.4s ease,
+      -webkit-backdrop-filter 0.4s ease;
+  }
+
+  /* ── GLASS STATE on scroll ── */
+  .section-header.header-scrolled {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom-color: var(--header-border);
+  }
+
+  /* Dawn sticky classes also get glass */
+  .section-header.shopify-section-header-sticky {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom-color: var(--header-border);
+  }
+
+  .outfyst-header {
+    max-width: 1600px;
+    margin: 0px auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height-desktop);
+    padding: 0 32px;
+    background: transparent;
+    position: relative;
+  }
+
+  /* ---- LEFT: Logo (desktop only) ---- */
+  .outfyst-header__logo {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    z-index: 2;
+  }
+
+  .outfyst-header__logo-img {
+    height: 28px;
+    width: auto;
+    display: block;
+  }
+
+  .outfyst-header__logo-text {
+    font-family: "Archivo Black", sans-serif;
+    font-size: 20px;
+    color: rgb(255, 255, 255);
+    letter-spacing: -0.01em;
+    color: var(--header-text);
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* ---- CENTER: Navigation ---- */
+  .outfyst-header__nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .outfyst-header__nav-link {
+    text-decoration: none;
+    font-family: Manrope, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.85);
+    text-transform: uppercase;
+    padding: 10px 4px;
+    cursor: pointer;
+    position: relative;
+    border-bottom: 2px solid transparent;
+    transition: 200ms;
+  }
+.outfyst-header__nav-link:hover {
+  border-bottom: 2px solid rgb(139, 15, 26);
+  transition: 200ms;
+}
+
+
+
+  /* ---- RIGHT: Icons (untouched Dawn logic) ---- */
+  .header__icons {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+  }
+
+  .header__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--header-text) !important;
+    background: transparent !important;
+    border: none !important;
+    position: relative;
+  }
+
+  .header__icon svg,
+  .header__icon .svg-wrapper svg,
+  .header__icon .svg-wrapper {
+    color: var(--header-text) !important;
+    fill: none;
+    stroke: var(--header-text) !important;
+  }
+
+  .cart-count-bubble {
+    background: var(--header-text) !important;
+    color: var(--header-bg) !important;
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+  }
+
+  .desktop-localization-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  /* ============================================================
+     MOBILE HAMBURGER — "+ OUTFYST" PILL BUTTON
+     ============================================================ */
+  .outfyst-hamburger {
+    position: absolute;
+    top: 20px;
+    left: 14px;
+    z-index: 30;
+    height: 42px;
+    padding: 0px 16px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(18, 18, 18, 0.45);
+    backdrop-filter: blur(22px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: rgba(0, 0, 0, 0.28) 0px 6px 18px, rgba(255, 255, 255, 0.22) 0px 1px 0px inset;
+    cursor: pointer;
+    color: #fff;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .outfyst-hamburger:active {
+    background: rgba(255, 255, 255, 0.22);
+    transform: scale(0.97);
+  }
+
+  .outfyst-hamburger__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    position: relative;
+    transition: transform var(--mobile-menu-duration) ease;
+  }
+
+  .outfyst-hamburger__icon::before,
+  .outfyst-hamburger__icon::after {
+    content: '';
+    position: absolute;
+    background: #fff;
+    border-radius: 1px;
+    transition:
+      transform var(--mobile-menu-duration) ease,
+      opacity var(--mobile-menu-duration) ease;
+  }
+  .outfyst-hamburger__icon::before {
+    width: 11px;
+    height: 1.2px;
+  }
+  .outfyst-hamburger__icon::after {
+    width: 1.2px;
+    height: 11px;
+  }
+
+  .outfyst-hamburger.is-open .outfyst-hamburger__icon {
+    transform: rotate(45deg);
+  }
+
+  .outfyst-hamburger__label {
+    display: block;
+    line-height: 1;
+  }
+
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media screen and (max-width: 990px) {
+    .outfyst-header {
+      height: var(--header-height-mobile);
+      padding: 0 16px;
+    }
+
+    .outfyst-header__nav {
+      display: none;
+    }
+
+
+    /* ── Remove center logo on mobile ── */
+    .outfyst-header__logo {
+      display: none !important;
+    }
+
+    .header__icon--search-modal,
+    .header__icon--account {
+      display: none !important;
+    }
+
+    
+  }
+
+  @media screen and (min-width: 991px) {
+    .outfyst-hamburger,
+    .outfyst-mobile-menu {
+      display: none !important;
+    }
+
+    .small-hide {
+      display: flex;
+    }
+  }
+
+  /* Hide Dawn's original header layout */
+  .header.header--left,
+  .header.header--center,
+  .header.header--top-center {
+    display: none;
+  }
+
+/* SVG base */
+.icon-wishlist {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* Path styling (light / normal look) */
+.icon-wishlist path {
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.4;
+  fill: none;
+  stroke-linejoin: round;
+}
+
+/* Hover effect */
+.header__icon--wishlist:hover .icon-wishlist path {
+  stroke: #ffffff;
+}
+
+.header__icon--cart {
+  margin-top: 6px !important;
+}
+
+/* ── MOBILE ICON PILLS (separate structure, desktop hidden) ── */
+.outfyst-mobile-icons {
+  display: none;
+}
+
+@media screen and (max-width: 990px) {
+  .outfyst-mobile-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+
+  .outfyst-mobile-icon-pill {
+    width: 42px;
+    height: 42px;
+    top: 14px;
+    position: relative;
+    border-radius: 999px;
+    cursor: pointer;
+    padding: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(18, 18, 18, 0.45);
+    backdrop-filter: blur(22px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: rgba(0, 0, 0, 0.28) 0px 6px 18px, rgba(255, 255, 255, 0.22) 0px 1px 0px inset;
+  }
+
+  .outfyst-mobile-icon-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: #c0392b;
+    color: #fff;
+    font-family: 'Manrope', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0 2px;
+  }
+.header__icon--cart {
+  margin-top: 0px !important;
+  margin-right: 10px;
+  
+}
+
+
+}
+
+
+/* Drawer slide-in from left */
+.outfyst-mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(320px, 85vw);
+  background: rgba(10, 10, 10, 0.97);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  z-index: 200;
+  padding: 24px 28px 40px;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  visibility: hidden;
+}
+
+.outfyst-mobile-menu.is-open {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+/* Backdrop overlay */
+.outfyst-menu-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 199;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 350ms ease;
+}
+
+.outfyst-menu-backdrop.is-open {
+  display: block;
+  opacity: 1;
+}
+
+/* Close button */
+.outfyst-mobile-menu__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  margin-left: auto;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.outfyst-mobile-menu__close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* ── DRAWER NAV LIST ─────────────────────────────────── */
+.outfyst-menu__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── PARENT ITEM ─────────────────────────────────────── */
+.outfyst-menu__item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.outfyst-menu__item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.outfyst-menu__link {
+  display: block;
+  padding: 15px 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  flex: 1;
+  transition: color 0.2s ease;
+}
+
+.outfyst-menu__link:hover {
+  color: #ffffff;
+}
+
+/* ── TOGGLE BUTTON (+/-) ─────────────────────────────── */
+.outfyst-menu__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.outfyst-menu__toggle:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.outfyst-menu__toggle .icon-minus { display: none; }
+.outfyst-menu__toggle[aria-expanded="true"] .icon-plus  { display: none; }
+.outfyst-menu__toggle[aria-expanded="true"] .icon-minus { display: block; }
+
+/* ── CHILD LIST ──────────────────────────────────────── */
+.outfyst-menu__child-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 8px 14px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  margin-left: 4px;
+  display: none;
+}
+
+.outfyst-menu__item.is-open > .outfyst-menu__child-list {
+  display: block;
+}
+
+.outfyst-menu__child-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.outfyst-menu__link--child {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 12px 0;
+}
+
+.outfyst-menu__link--child:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── SUBCHILD LIST ───────────────────────────────────── */
+.outfyst-menu__subchild-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 6px 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  margin-left: 4px;
+  display: none;
+}
+
+.outfyst-menu__child-item.is-open > .outfyst-menu__subchild-list {
+  display: block;
+}
+
+.outfyst-menu__subchild-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.outfyst-menu__link--subchild {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  color: rgba(255, 255, 255, 0.38);
+  padding: 10px 0;
+  text-transform: uppercase;
+}
+
+.brand-name {
+    text-decoration: none;
+}
+.outfyst-menu__link--subchild:hover {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.outfyst-mobile-menu__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+
+
+/* ── MOBILE BOTTOM NAV ───────────────────────────────────────── */
+.outfyst-bottom-nav {
+  display: none;
+}
+
+@media screen and (max-width: 990px) {
+  .outfyst-bottom-nav {
+    display: block;
+    position: fixed;
+    bottom: 20px;
+    left: 14px;
+    right: 14px;
+    z-index: 40;
+    transform: translateY(0px);
+    transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: auto;
+  }
+
+  .outfyst-bottom-nav__inner {
+    position: relative;
+    height: 66px;
+  }
+
+  /* Left pill — Home, Account, Search */
+  .outfyst-bottom-nav__pill {
+    position: absolute;
+    inset: 0 56px 0 0;
+    height: 66px;
+    border-radius: 999px;
+    background: rgba(18, 18, 18, 0.55);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 8px 24px, rgba(255, 255, 255, 0.18) 0px 1px 0px inset;
+    display: flex;
+    align-items: center;
+    padding: 0 12px 0 18px;
+    justify-content: space-around;
+  }
+
+  /* Each icon button */
+  .outfyst-bottom-nav__btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: rgba(245, 242, 236, 0.7);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .outfyst-bottom-nav__btn:hover {
+    color: rgba(245, 242, 236, 1);
+  }
+
+  /* Right: Cart metallic pill button */
+  .outfyst-bottom-nav-stories-popup {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    background: radial-gradient(circle at 30% 25%, rgb(255, 255, 255) 0%, rgb(232, 232, 232) 18%, transparent 40%),
+                linear-gradient(160deg, rgb(242, 242, 242) 0%, rgb(201, 201, 201) 45%, rgb(111, 111, 111) 100%);
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 8px 20px,
+                rgba(255, 255, 255, 0.95) 0px 1px 0px inset,
+                rgba(0, 0, 0, 0.28) 0px -10px 18px inset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #111;
+  }
+
+  .outfyst-bottom-nav-stories-popup svg {
+    width: 22px;
+    height: 22px;
+    stroke: #111;
+    fill: none;
+  }
+
+}
+@media screen and (max-width: 990px) {
+
+  /* Specific elements hide karo */
+  .header__icons .desktop-localization-wrapper,
+  .header__icons .header__icon--account,
+  .header__icons .header__icon--cart,
+  .header__icons [class*="header__icon"] {
+    display: none !important;
+  }
+}
+/* ── PAGE CONTENT PUSH DOWN — header overlap fix ── */
+body {
+  padding-top: 92px; /* header height + top */
+}
+
+@media screen and (max-width: 990px) {
+  body {
+    padding-top: 0px; /* mobile par header transparent + no fixed top */
+  }
+}
+</style>
+
+
+<script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
+
+
+<!-- ============================================================
+     OUTFYST CUSTOM HEADER MARKUP
+     ============================================================ -->
+
+<header class="header-OUTFYST">
+  <div class="outfyst-header page-width">
+    <!-- DESKTOP only: Logo (hidden on mobile via CSS) -->
+    <a
+      href="{{ routes.root_url }}"
+      class="outfyst-header__logo"
+      aria-label="{{ shop.name }}"
+    >
+      {%- if section.settings.logo != blank -%}
+        <img
+          src="{{ section.settings.logo | image_url: width: 200 }}"
+          alt="{{ section.settings.logo.alt | default: shop.name }}"
+          class="outfyst-header__logo-img"
+          width="{{ section.settings.logo.width }}"
+          height="{{ section.settings.logo.height }}"
+          loading="eager"
+        >
+      {%- else -%}
+        <span class="outfyst-header__logo-text">{{ section.settings.logo_text | default: shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    <!-- CENTER: Desktop Navigation -->
+    {%- if section.settings.menu != blank -%}
+      <nav class="outfyst-header__nav" role="navigation" aria-label="Main navigation">
+        {%- for link in linklists[section.settings.menu].links -%}
+          <a
+            href="{{ link.url }}"
+            class="outfyst-header__nav-link{% if link.active %} outfyst-header__nav-link--active{% endif %}"
+            {% if link.current %}aria-current="page"{% endif %}
+          >
+            {{ link.title }}
+          </a>
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+    <!-- RIGHT: Icons — Dawn default logic, untouched -->
+    <div class="header__icons{% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header__icons--localization header-localization{% endif %}">
+      <div class="desktop-localization-wrapper">
+        {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
+          <localization-form class="small-hide medium-hide" data-prevent-hide>
+            {%- form 'localization', id: 'HeaderCountryForm', class: 'localization-form' -%}
+              <div>
+                <h2 class="visually-hidden" id="HeaderCountryLabel">{{ 'localization.country_label' | t }}</h2>
+                {%- render 'country-localization', localPosition: 'HeaderCountry' -%}
+              </div>
+            {%- endform -%}
+          </localization-form>
+        {% endif %}
+
+        {%- if section.settings.enable_language_selector and localization.available_languages.size > 1 -%}
+          <localization-form class="small-hide medium-hide" data-prevent-hide>
+            {%- form 'localization', id: 'HeaderLanguageForm', class: 'localization-form' -%}
+              <div>
+                <h2 class="visually-hidden" id="HeaderLanguageLabel">{{ 'localization.language_label' | t }}</h2>
+                {%- render 'language-localization', localPosition: 'HeaderLanguage' -%}
+              </div>
+            {%- endform -%}
+          </localization-form>
+        {%- endif -%}
+      </div>
+
+      {% render 'header-search', input_id: 'Search-In-Modal' %}
+
+      {%- if shop.customer_accounts_enabled -%}
+        <a
+          href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+          class="header__icon--account link focus-inset{% if section.settings.menu != blank %} small-hide{% endif %}"
+          rel="nofollow"
+        >
+          {%- if section.settings.enable_customer_avatar -%}
+            <account-icon>
+              {%- if customer and customer.has_avatar? -%}
+                {{ customer | avatar }}
+              {%- else -%}
+                <span class="svg-wrapper">{{ 'user-icon.svg' | inline_asset_content }}</span>
+              {%- endif -%}
+            </account-icon>
+          {%- else -%}
+            <span class="svg-wrapper">{{ 'user-icon.svg' | inline_asset_content }}</span>
+          {%- endif -%}
+          <span class="visually-hidden">
+            {%- liquid
+              if customer
+                echo 'customer.account_fallback' | t
+              else
+                echo 'customer.log_in' | t
+              endif
+            -%}
+          </span>
+        </a>
+      {%- endif -%}
+
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            {% render block %}
+        {%- endcase -%}
+      {%- endfor -%}
+
+      <a href="{{ routes.cart_url }}" class="header__icon--cart link focus-inset" id="cart-icon-bubble">
+        {% if cart == empty %}
+          <span class="svg-wrapper">{{ 'cart-icon.svg' | inline_asset_content }}</span>
+        {% else %}
+          <span class="svg-wrapper">{{ 'cart-icon.svg' | inline_asset_content }}</span>
+        {% endif %}
+        <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
+        {%- if cart != empty -%}
+          <div class="cart-count-bubble">
+            {%- if cart.item_count < 100 -%}
+              <span aria-hidden="true">{{ cart.item_count }}</span>
+            {%- endif -%}
+            <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+          </div>
+        {%- endif -%}
+      </a>
+    </div>
+
+
+    <!------------ MOBILE header------------------------------------- -->
+      <button
+        class="outfyst-hamburger"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="outfyst-mobile-menu"
+        id="outfyst-hamburger-btn"
+        type="button"
+      >
+        <span class="outfyst-hamburger__icon" aria-hidden="true"></span>
+        <span class="outfyst-hamburger__label">{{ section.settings.logo_text | default: shop.name }}</span>
+      </button>
+
+      <!-- MOBILE ONLY: Wishlist + Cart icon pills -->
+      <div class="outfyst-mobile-icons">
+
+        {% comment %} <a href="/pages/wishlist" class="outfyst-mobile-icon-pill header__icon--wishlist link focus-inset">
+            <span class="">
+              <svg class="icon icon-wishlist" viewBox="0 0 24 24">
+                <path d="M6 4h12v17l-6-4-6 4V4z"></path>
+              </svg>
+            </span>
+            <span class="visually-hidden">Wishlist</span>
+          </a> {% endcomment %}
+        <a href="{{ routes.cart_url }}" class="outfyst-mobile-icon-pill header__icon--cart link focus-inset" id="cart-icon-bubble">
+            {% if cart == empty %}
+              <span class="svg-wrapper">{{ 'cart-icon.svg' | inline_asset_content }}</span>
+            {% else %}
+              <span class="svg-wrapper">{{ 'cart-icon.svg' | inline_asset_content }}</span>
+            {% endif %}
+            <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
+            {%- if cart != empty -%}
+              <div class="cart-count-bubble">
+                {%- if cart.item_count < 100 -%}
+                  <span aria-hidden="true">{{ cart.item_count }}</span>
+                {%- endif -%}
+                <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+              </div>
+            {%- endif -%}
+          </a>
+      </div>
+
+      <!-- MOBILE drower MENU  -->
+      {%- if section.settings.menu != blank -%}
+        <nav
+          class="outfyst-mobile-menu"
+          id="outfyst-mobile-menu"
+          aria-label="Mobile navigation"
+          aria-hidden="true"
+        >
+            
+        <div class="outfyst-mobile-menu__header">
+          <a href="{{ routes.root_url }}" class="brand-name" aria-label="{{ shop.name }}">
+            <span class="outfyst-header__logo-text">{{ section.settings.logo_text | default: shop.name }}</span>
+          </a>
+          <button class="outfyst-mobile-menu__close" id="outfyst-menu-close" aria-label="Close menu" type="button">
+            <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="1" y1="1" x2="17" y2="17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="17" y1="1" x2="1" y2="17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+          <ul class="outfyst-menu__list">
+            {%- for link in linklists[section.settings.menu].links -%}
+              <li class="outfyst-menu__item {%- if link.links.size > 0 %} has-children{%- endif -%}">
+
+                <div class="outfyst-menu__item-row">
+                  <a href="{{ link.url }}" class="outfyst-menu__link">{{ link.title }}</a>
+
+                  {%- if link.links.size > 0 -%}
+                    <button
+                      type="button"
+                      class="outfyst-menu__toggle"
+                      aria-expanded="false"
+                      aria-label="Toggle {{ link.title }}"
+                    >
+                      <svg class="icon-plus" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <line x1="6" y1="0" x2="6" y2="12" stroke="currentColor" stroke-width="1.2"/>
+                        <line x1="0" y1="6" x2="12" y2="6" stroke="currentColor" stroke-width="1.2"/>
+                      </svg>
+                      <svg class="icon-minus" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <line x1="0" y1="6" x2="12" y2="6" stroke="currentColor" stroke-width="1.2"/>
+                      </svg>
+                    </button>
+                  {%- endif -%}
+                </div>
+
+                {%- if link.links.size > 0 -%}
+                  <ul class="outfyst-menu__child-list">
+                    {%- for child_link in link.links -%}
+                      <li class="outfyst-menu__child-item {%- if child_link.links.size > 0 %} has-children{%- endif -%}">
+
+                        <div class="outfyst-menu__item-row">
+                          <a href="{{ child_link.url }}" class="outfyst-menu__link outfyst-menu__link--child">{{ child_link.title }}</a>
+
+                          {%- if child_link.links.size > 0 -%}
+                            <button
+                              type="button"
+                              class="outfyst-menu__toggle"
+                              aria-expanded="false"
+                              aria-label="Toggle {{ child_link.title }}"
+                            >
+                              <svg class="icon-plus" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <line x1="6" y1="0" x2="6" y2="12" stroke="currentColor" stroke-width="1.2"/>
+                                <line x1="0" y1="6" x2="12" y2="6" stroke="currentColor" stroke-width="1.2"/>
+                              </svg>
+                              <svg class="icon-minus" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <line x1="0" y1="6" x2="12" y2="6" stroke="currentColor" stroke-width="1.2"/>
+                              </svg>
+                            </button>
+                          {%- endif -%}
+                        </div>
+
+                        {%- if child_link.links.size > 0 -%}
+                          <ul class="outfyst-menu__subchild-list">
+                            {%- for sub_link in child_link.links -%}
+                              <li class="outfyst-menu__subchild-item">
+                                <a href="{{ sub_link.url }}" class="outfyst-menu__link outfyst-menu__link--subchild">{{ sub_link.title }}</a>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {%- endif -%}
+  </div>
+  <div class="outfyst-menu-backdrop" id="outfyst-menu-backdrop"></div>
+
+
+  <!-- MOBILE BOTTOM NAV -->
+<div class="outfyst-bottom-nav">
+  <div class="outfyst-bottom-nav__inner">
+
+    <!-- Left pill: Home, Account only -->
+    <div class="outfyst-bottom-nav__pill">
+
+      <!-- Home -->
+      <a href="{{ routes.root_url }}" class="outfyst-bottom-nav__btn" aria-label="Home">
+        <svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1v-9z" stroke="currentColor" stroke-width="1.75" fill="none" stroke-linejoin="round"></path></svg>
+        <span style="position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 999px; background: rgb(139, 15, 26);"></span>
+      </a>
+
+      <!-- Account -->
+      <a
+        href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+        class="outfyst-bottom-nav__btn"
+        aria-label="Account"
+        rel="nofollow"
+      >
+        {%- if customer and customer.has_avatar? -%}
+          <account-icon>{{ customer | avatar }}</account-icon>
+        {%- else -%}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="9" r="3.5" stroke="currentColor" stroke-width="1.75"/>
+            <path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.75"/>
+          </svg>
+        {%- endif -%}
+      </a>
+
+      <!-- Search button — pill ni andar -->
+      <button
+        type="button"
+        class="outfyst-bottom-nav__btn"
+        aria-label="Search"
+        id="outfyst-mobile-search-trigger"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.75"/>
+          <path d="M20 20l-3-3" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+    </div>
+
+    <!-- Right: Stories button -->
+    <button type="button" class="outfyst-bottom-nav-stories-popup" aria-label="Stories" data-stories-open="stories-popup">
+      <svg xmlns="http://www.w3.org/2000/svg" width="21.437" height="19.03" viewBox="0 0 21.437 19.03">
+        <path id="Path_772" data-name="Path 772" d="M51.669,81.8a5.889,5.889,0,0,0-.139-.654,4.05,4.05,0,0,0-.288-.713,3.348,3.348,0,0,0-1.412-1.381c-.1-.05-.205-.106-.311-.152a3.276,3.276,0,0,0-.429-.169c-.281-.076-.565-.146-.852-.2-.236-.043-.478-.052-.716-.081a8.827,8.827,0,0,0-2.211.057,4.8,4.8,0,0,0-1.195.3c-.182.074-.363.149-.539.238a3.021,3.021,0,0,0-.675.464c-.1.092-.191.2-.289.292-.019.019-.052.043-.073.038s-.041-.04-.049-.066a.339.339,0,0,1-.009-.1c0-.193.006-.387,0-.58a6.415,6.415,0,0,0-.1-1.308,3.544,3.544,0,0,0-.125-.5c-.054-.144-.1-.293-.166-.43a2.275,2.275,0,0,0-.336-.5,1.976,1.976,0,0,0-.783-.546,2.094,2.094,0,0,0-.687-.155,3.46,3.46,0,0,0-1.274.109,2.276,2.276,0,0,0-.572.282,2.314,2.314,0,0,0-.729.853,3.041,3.041,0,0,0-.28.73.472.472,0,0,1-.159.291.368.368,0,0,1-.045-.095,1.712,1.712,0,0,0-.124-.4,2.536,2.536,0,0,0-.3-.563,1.818,1.818,0,0,0-.6-.554,1.238,1.238,0,0,0-.413-.171,1.688,1.688,0,0,1-.176-.041,2.4,2.4,0,0,0-1.308.082,1.618,1.618,0,0,0-.559.307,2.188,2.188,0,0,0-.632.861,2.766,2.766,0,0,0-.148.437q-.043.181-.084.363c-.024.1-.042.21-.066.314a1.537,1.537,0,0,0-.05.2c-.009.111-.006.223-.007.335v4.061c0,.163,0,.327,0,.49a.132.132,0,0,1-.085.14c-.2.095-.4.191-.592.3a4.243,4.243,0,0,0-.456.31,2.576,2.576,0,0,0-.556.586,5.236,5.236,0,0,0-.283.458,3.27,3.27,0,0,0-.166.375,3.138,3.138,0,0,0-.2.69c-.015.106-.043.21-.066.314a.989.989,0,0,0-.045.2c0,.427,0,.851,0,1.276a.366.366,0,0,0,.02.152,2.045,2.045,0,0,1,.1.438c.046.2.1.4.16.6a4.1,4.1,0,0,0,.176.4,2.8,2.8,0,0,0,.422.658,3.371,3.371,0,0,0,1.3.958c.1.042.2.088.31.123a5.878,5.878,0,0,0,.613.19,8.136,8.136,0,0,0,1.056.158,9.319,9.319,0,0,0,1.711,0,5.19,5.19,0,0,0,.818-.1c.2-.054.409-.095.612-.15.123-.033.245-.076.364-.121a3.28,3.28,0,0,0,.4-.164,4.165,4.165,0,0,0,.536-.327c.175-.13.329-.288.491-.435.038-.035.05-.118.121-.089s.043.095.049.15a.237.237,0,0,1,0,.026c0,.223,0,.447-.005.67a6.789,6.789,0,0,0,.132,1.409.493.493,0,0,0,.028.112c.073.16.1.334.177.5a2.528,2.528,0,0,0,.322.537,1.946,1.946,0,0,0,.721.566,2.351,2.351,0,0,0,.762.213,5.872,5.872,0,0,0,.888,0,2.067,2.067,0,0,0,.607-.16,1.834,1.834,0,0,0,.526-.316,2.471,2.471,0,0,0,.613-.771,2.868,2.868,0,0,0,.277-.73.7.7,0,0,1,.065-.168,1.277,1.277,0,0,1,.095-.139c.026.082.044.132.058.184a1.227,1.227,0,0,0,.041.175,4.534,4.534,0,0,0,.3.611,1.892,1.892,0,0,0,.969.806,2.3,2.3,0,0,0,.592.118,2.445,2.445,0,0,0,1.145-.183,1.867,1.867,0,0,0,.338-.181,1.822,1.822,0,0,0,.433-.419A2.237,2.237,0,0,0,48.927,93a2.407,2.407,0,0,0,.159-.461c.026-.13.06-.258.088-.387.021-.1.039-.193.061-.289a1.385,1.385,0,0,0,.053-.208c.009-.142.007-.284.007-.425V86.87c0-.039,0-.077,0-.116a.107.107,0,0,1,.074-.118c.1-.04.2-.081.294-.13a3.491,3.491,0,0,0,.312-.178c.154-.1.308-.2.455-.312a2.571,2.571,0,0,0,.556-.586,5.231,5.231,0,0,0,.283-.458,4.271,4.271,0,0,0,.364-1.065c.016-.11.046-.218.071-.326a.853.853,0,0,0,.04-.173q0-.651,0-1.3a.855.855,0,0,0-.041-.186C51.692,81.881,51.676,81.84,51.669,81.8ZM33.586,79.909a1.05,1.05,0,0,1,.582-.883,1.715,1.715,0,0,1,.775-.2c.2,0,.4,0,.592,0a1.613,1.613,0,0,1,.469.075,2.009,2.009,0,0,1,.4.14,1.09,1.09,0,0,1,.5.518,1.075,1.075,0,0,1,.091.437q0,.361,0,.722a.49.49,0,0,1-.006.077c-.016.1-.043.123-.145.123l-.747,0h-.812v0H33.75c-.134,0-.169-.027-.17-.166a8.359,8.359,0,0,1,.007-.837Zm5.908,8.058a1.04,1.04,0,0,1-.5.561,2.653,2.653,0,0,1-.419.157.97.97,0,0,1-.137.037c-.139.027-.278.054-.417.076-.114.018-.23.027-.345.046a11.076,11.076,0,0,1-1.517.081c-.275.007-.55,0-.824,0v.012c-.554-.011-1.108-.017-1.662-.034-.227-.007-.453-.039-.679-.062q-.211-.021-.422-.049c-.071-.009-.144-.024-.215-.039a3.377,3.377,0,0,1-.337-.085,1.282,1.282,0,0,1-.75-.528.969.969,0,0,1-.151-.459,1.212,1.212,0,0,1,.122-.636.95.95,0,0,1,.325-.359,2.031,2.031,0,0,1,.674-.27,9.875,9.875,0,0,1,1.827-.2c.924-.026,1.847-.027,2.769.007.308.012.615.067.924.082a3.919,3.919,0,0,1,.848.15,1.283,1.283,0,0,1,.8.524.934.934,0,0,1,.125.294,1.23,1.23,0,0,1-.036.7Zm.376-5.6c-.176,0-.352-.008-.528-.008a1.45,1.45,0,0,1-1.052-.471,1.839,1.839,0,0,1-.471-.8,1.612,1.612,0,0,1-.047-.433c0-.237.012-.473.03-.708a1.389,1.389,0,0,1,.61-1.1,1.706,1.706,0,0,1,.687-.272,3.609,3.609,0,0,1,.831-.082c.162.011.324.035.485.055a1.562,1.562,0,0,1,.177.036,1.3,1.3,0,0,1,.874.619,1.593,1.593,0,0,1,.212.811c0,.159,0,.318,0,.477h.007c0,.215.012.43,0,.644a1.287,1.287,0,0,1-.905,1.138,3.424,3.424,0,0,1-.907.094Zm4.408,7.42c-.014.171-.016.343-.024.515a1.407,1.407,0,0,1-.6,1.155,1.715,1.715,0,0,1-.684.28,3.355,3.355,0,0,1-.921.079,3.732,3.732,0,0,1-.71-.118,1.238,1.238,0,0,1-.685-.476,2.293,2.293,0,0,1-.173-.341,1.867,1.867,0,0,1-.11-.8c0-.279-.015-.559-.006-.838a1.271,1.271,0,0,1,.539-1.022,1.344,1.344,0,0,1,.683-.247c.213-.021.428-.028.643-.041v.012c.142,0,.284,0,.425,0a1.575,1.575,0,0,1,1.384.843,2.66,2.66,0,0,1,.123.24,1.405,1.405,0,0,1,.114.755Zm4.184.657a1.032,1.032,0,0,1-.567.836,1.728,1.728,0,0,1-.812.209c-.159,0-.318-.005-.476,0a2.19,2.19,0,0,1-.77-.132,1.094,1.094,0,0,1-.627-.487.839.839,0,0,1-.139-.41c0-.3-.008-.592-.011-.888a.324.324,0,0,1,.007-.064c.018-.092.045-.114.139-.114h1.558v0H48.31c.123,0,.161.026.163.146a7.7,7.7,0,0,1-.011.9Zm2.468-7.56a1.017,1.017,0,0,1-.479.767,2.967,2.967,0,0,1-.406.191,1.085,1.085,0,0,1-.213.047,10.055,10.055,0,0,1-2.148.216c-.713.007-1.426.007-2.139,0-.343-.006-.685-.046-1.027-.071-.073-.005-.145-.022-.218-.024a3.194,3.194,0,0,1-.86-.15,1.245,1.245,0,0,1-.771-.5,1.044,1.044,0,0,1-.144-.313,1.209,1.209,0,0,1,.033-.7,1.022,1.022,0,0,1,.5-.562,1.13,1.13,0,0,1,.417-.161c.063-.007.123-.038.187-.047.233-.038.467-.068.7-.107a10.8,10.8,0,0,1,1.542-.082c.275-.006.55,0,.824,0v-.017c.627.016,1.254.017,1.88.053.379.022.757.095,1.135.149a1.577,1.577,0,0,1,.287.069,1.294,1.294,0,0,1,.752.525.84.84,0,0,1,.151.445c0,.088.007.179,0,.268Z" transform="translate(-30.307 -75.636)" fill="#000000"></path>
+      </svg>
+    </button>
+
+  </div>
+</div>
+{% render 'outfyst-stories-popup', blocks: section.blocks %}
+</header>
+{% comment %} <script>
+  (function () {
+    var trigger = document.getElementById('outfyst-mobile-search-trigger');
+    if (!trigger) return;
+
+    trigger.addEventListener('click', function () {
+      var modal = document.querySelector('.header__search .search-modal.modal__content');
+      var details = document.querySelector('.header__search details');
+      var input = document.querySelector('#Search-In-Modal');
+
+      if (!modal || !details) return;
+
+      details.setAttribute('open', '');
+      document.body.style.overflow = 'hidden';
+
+      setTimeout(function () {
+        if (input) input.focus();
+      }, 100);
+
+      function closeModal() {
+        details.removeAttribute('open');
+        document.body.style.overflow = '';
+      }
+
+      var closeBtn = modal.querySelector('.search-modal__close-button');
+      if (closeBtn) closeBtn.addEventListener('click', closeModal, { once: true });
+
+      document.addEventListener('keydown', function onKeydown(e) {
+        if (e.key === 'Escape') {
+          closeModal();
+          document.removeEventListener('keydown', onKeydown);
+        }
+      });
+
+      modal.addEventListener('click', function onBackdrop(e) {
+        if (e.target === modal) {
+          closeModal();
+          modal.removeEventListener('click', onBackdrop);
+        }
+      });
+    });
+  })();
+</script> {% endcomment %}
+{%- if settings.cart_type == 'notification' -%}
+  {%- render 'cart-notification',
+    color_scheme: section.settings.color_scheme,
+    desktop_menu_type: section.settings.menu_type_desktop
+  -%}
+{%- endif -%}
+
+
+{% javascript %}
+  /* ============================================================
+     OUTFYST MOBILE MENU TOGGLE
+     ============================================================ */
+ 
+(function () {
+  var btn      = document.getElementById('outfyst-hamburger-btn');
+  var menu     = document.getElementById('outfyst-mobile-menu');
+  var closeBtn = document.getElementById('outfyst-menu-close');
+  var backdrop = document.getElementById('outfyst-menu-backdrop');
+  if (!btn || !menu) return;
+
+  function openMenu() {
+    menu.classList.add('is-open');
+    menu.setAttribute('aria-hidden', 'false');
+    btn.setAttribute('aria-expanded', 'true');
+    btn.classList.add('is-open');
+    if (backdrop) backdrop.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    menu.classList.remove('is-open');
+    menu.setAttribute('aria-hidden', 'true');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.classList.remove('is-open');
+    if (backdrop) backdrop.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  btn.addEventListener('click', function () {
+    menu.classList.contains('is-open') ? closeMenu() : openMenu();
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+  if (backdrop) backdrop.addEventListener('click', closeMenu);
+
+  // Accordion toggles (parent / child / sub-child)
+  menu.addEventListener('click', function (e) {
+    var toggle = e.target.closest('.outfyst-menu__toggle');
+    if (!toggle) return;
+
+    var item       = toggle.closest('li');
+    var isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+
+    item.parentElement.querySelectorAll(':scope > li').forEach(function (sib) {
+      if (sib === item) return;
+      var sibToggle = sib.querySelector(':scope > .outfyst-menu__item-row > .outfyst-menu__toggle');
+      if (sibToggle) sibToggle.setAttribute('aria-expanded', 'false');
+      sib.classList.remove('is-open');
+    });
+
+    toggle.setAttribute('aria-expanded', String(!isExpanded));
+    item.classList.toggle('is-open', !isExpanded);
+  });
+})();
+
+
+
+/* ============================================================
+   BOTTOM NAV — HIDE ON SCROLL DOWN, SHOW ON SCROLL UP
+   ============================================================ */
+(function () {
+  var nav = document.querySelector('.outfyst-bottom-nav');
+  if (!nav) return;
+
+  var lastY = window.scrollY;
+  var ticking = false;
+
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var currentY = window.scrollY;
+      if (currentY > lastY && currentY > 80) {
+        // scrolling down — slide out
+        nav.style.transform = 'translateY(120px)';
+      } else {
+        // scrolling up — slide back in
+        nav.style.transform = 'translateY(0px)';
+      }
+      lastY = currentY;
+      ticking = false;
+    });
+  }, { passive: true });
+})();
+
+  /* ============================================================
+     STICKY HEADER (Dawn StickyHeader custom element preserved)
+     ============================================================ */
+  class StickyHeader extends HTMLElement {
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      this.header = document.querySelector('.section-header');
+      this.headerIsAlwaysSticky =
+        this.getAttribute('data-sticky-type') === 'always' ||
+        this.getAttribute('data-sticky-type') === 'reduce-logo-size';
+      this.headerBounds = {};
+
+      this.setHeaderHeight();
+
+      window.matchMedia('(max-width: 990px)').addEventListener('change', this.setHeaderHeight.bind(this));
+
+      if (this.headerIsAlwaysSticky) {
+        this.header.classList.add('shopify-section-header-sticky');
+      }
+
+      this.currentScrollTop = 0;
+      this.preventReveal = false;
+      this.predictiveSearch = this.querySelector('predictive-search');
+
+      this.onScrollHandler = this.onScroll.bind(this);
+      this.hideHeaderOnScrollUp = () => (this.preventReveal = true);
+
+      this.addEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+      window.addEventListener('scroll', this.onScrollHandler, false);
+
+      this.createObserver();
+    }
+
+    setHeaderHeight() {
+      document.documentElement.style.setProperty('--header-height', `${this.header.offsetHeight}px`);
+    }
+
+    disconnectedCallback() {
+      this.removeEventListener('preventHeaderReveal', this.hideHeaderOnScrollUp);
+      window.removeEventListener('scroll', this.onScrollHandler);
+    }
+
+    createObserver() {
+      let observer = new IntersectionObserver((entries, observer) => {
+        this.headerBounds = entries[0].intersectionRect;
+        observer.disconnect();
+      });
+      observer.observe(this.header);
+    }
+
+    onScroll() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (this.predictiveSearch && this.predictiveSearch.isOpen) return;
+
+      if (scrollTop > this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+        this.header.classList.add('scrolled-past-header');
+        if (this.preventHide) return;
+        requestAnimationFrame(this.hide.bind(this));
+      } else if (scrollTop < this.currentScrollTop && scrollTop > this.headerBounds.bottom) {
+        this.header.classList.add('scrolled-past-header');
+        if (!this.preventReveal) {
+          requestAnimationFrame(this.reveal.bind(this));
+        } else {
+          window.clearTimeout(this.isScrolling);
+          this.isScrolling = setTimeout(() => {
+            this.preventReveal = false;
+          }, 66);
+          requestAnimationFrame(this.hide.bind(this));
+        }
+      } else if (scrollTop <= this.headerBounds.top) {
+        this.header.classList.remove('scrolled-past-header');
+        requestAnimationFrame(this.reset.bind(this));
+      }
+
+      this.currentScrollTop = scrollTop;
+    }
+
+    hide() {
+      if (this.headerIsAlwaysSticky) return;
+      this.header.classList.add('shopify-section-header-hidden', 'shopify-section-header-sticky');
+      this.closeMenuDisclosure();
+      this.closeSearchModal();
+    }
+
+    reveal() {
+      if (this.headerIsAlwaysSticky) return;
+      this.header.classList.add('shopify-section-header-sticky', 'animate');
+      this.header.classList.remove('shopify-section-header-hidden');
+    }
+
+    reset() {
+      if (this.headerIsAlwaysSticky) return;
+      this.header.classList.remove('shopify-section-header-hidden', 'shopify-section-header-sticky', 'animate');
+    }
+
+    closeMenuDisclosure() {
+      this.disclosures = this.disclosures || this.header.querySelectorAll('header-menu');
+      this.disclosures.forEach((disclosure) => disclosure.close());
+    }
+
+    closeSearchModal() {
+      this.searchModal = this.searchModal || this.header.querySelector('details-modal');
+      this.searchModal.close(false);
+    }
+  }
+
+  customElements.define('sticky-header', StickyHeader);
+{% endjavascript %}
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    {% if settings.logo %}
+      "logo": {{ settings.logo | image_url: width: 500 | prepend: "https:" | json }},
+    {% endif %}
+    "sameAs": [
+      {{ settings.social_twitter_link | json }},
+      {{ settings.social_facebook_link | json }},
+      {{ settings.social_pinterest_link | json }},
+      {{ settings.social_instagram_link | json }},
+      {{ settings.social_tiktok_link | json }},
+      {{ settings.social_tumblr_link | json }},
+      {{ settings.social_snapchat_link | json }},
+      {{ settings.social_youtube_link | json }},
+      {{ settings.social_vimeo_link | json }}
+    ],
+    "url": {{ request.origin | append: page.url | json }}
+  }
+</script>
+
+{%- if request.page_type == 'index' -%}
+  {% assign potential_action_target = request.origin | append: routes.search_url | append: '?q={search_term_string}' %}
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "WebSite",
+      "name": {{ shop.name | json }},
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {{ potential_action_target | json }},
+        "query-input": "required name=search_term_string"
+      },
+      "url": {{ request.origin | append: page.url | json }}
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:sections.header.name",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image",
+      "info": "Leave blank to show text logo"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo text",
+      "default": "OUTFYST",
+      "info": "Shown when no logo image is uploaded"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "Navigation menu"
+    },
+    {
+      "type": "header",
+      "content": "Localization"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "default": true,
+      "label": "t:sections.header.settings.enable_country_selector.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "default": true,
+      "label": "t:sections.header.settings.enable_language_selector.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_customer_avatar",
+      "default": true,
+      "label": "t:sections.header.settings.enable_customer_avatar.label"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mega_menu",
+      "name": "Mega Menu",
+      "settings": [
+      ]
+    },
+    {
+      "type": "dropdown-menu",
+      "name": "dropdown menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_title",
+          "label": "Menu Title (Match Navigation)"
+        }
+      ]
+    },
+    {
+  "type": "story",
+  "name": "Story Slide",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Story Image",
+      "info": "Best size: 9:16 portrait (e.g. 1080×1920px)"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Story Title",
+      "default": "NEW DROP",
+      "info": "Shown top-left in amber. Keep it short (1–3 words)."
+    },
+    {
+      "type": "url",
+      "id": "shop_url",
+      "label": "Shop Button Link",
+      "info": "URL the 'Shop Now' button points to (e.g. /collections/all)"
+    },
+    {
+      "type": "text",
+      "id": "shop_label",
+      "label": "Shop Button Text",
+      "default": "Shop Now",
+      "info": "Label on the CTA button at the bottom of the story."
+    },
+    {
+      "type": "range",
+      "id": "duration",
+      "label": "Slide Duration (seconds)",
+      "min": 3,
+      "max": 15,
+      "step": 1,
+      "default": 5,
+      "unit": "s"
+    }
+  ]
+},
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}

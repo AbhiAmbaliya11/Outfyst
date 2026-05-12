@@ -1,0 +1,267 @@
+{% assign Outfyst_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .Out-marquee-announcement-{{ Outfyst_id }} {
+    width: 100%;
+    background-color: {{ block.settings.background_color }};
+    overflow: hidden;
+    position: relative;
+    display: block;
+  }
+
+  .Out-marquee-wrapper-{{ Outfyst_id }} {
+    display: flex;
+    width: fit-content;
+    animation: Out-marquee-scroll-{{ Outfyst_id }} {{ block.settings.scroll_duration }}s linear infinite;
+  }
+
+  {% if block.settings.pause_on_hover %}
+    .Out-marquee-wrapper-{{ Outfyst_id }}:hover {
+      animation-play-state: paused;
+    }
+  {% endif %}
+
+  .Out-marquee-content-{{ Outfyst_id }} {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    padding: {{ block.settings.vertical_padding }}px 0;
+  }
+
+  .Out-marquee-item-{{ Outfyst_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.font_size }}px;
+    letter-spacing: {{ block.settings.letter_spacing }}px;
+    {% if block.settings.text_uppercase %}
+      text-transform: uppercase;
+    {% endif %}
+    padding: 0 {{ block.settings.item_spacing }}px;
+  }
+
+  .Out-marquee-separator-{{ Outfyst_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.font_size }}px;
+    padding: 0 {{ block.settings.item_spacing }}px;
+  }
+
+  @keyframes Out-marquee-scroll-{{ Outfyst_id }} {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .Out-marquee-item-{{ Outfyst_id }} {
+      font-size: {{ block.settings.font_size | times: 0.85 }}px;
+    }
+
+    .Out-marquee-separator-{{ Outfyst_id }} {
+      font-size: {{ block.settings.font_size | times: 0.85 }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="Out-marquee-announcement-{{ Outfyst_id }}" {{ block.shopify_attributes }}>
+  <div class="Out-marquee-wrapper-{{ Outfyst_id }}">
+    <div class="Out-marquee-content-{{ Outfyst_id }}">
+      {% if block.settings.text_1 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_1 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.text_2 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_2 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.text_3 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_3 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.text_4 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_4 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.text_5 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_5 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.text_6 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_6 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+    </div>
+
+    <div class="Out-marquee-content-{{ Outfyst_id }}" aria-hidden="true">
+      {% if block.settings.text_1 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_1 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.text_2 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_2 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.text_3 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_3 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.text_4 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_4 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.text_5 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_5 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+      {% if block.settings.text_6 != blank %}
+        <span class="Out-marquee-item-{{ Outfyst_id }}">{{ block.settings.text_6 }}</span>
+        <span class="Out-marquee-separator-{{ Outfyst_id }}">{{ block.settings.separator }}</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Announcement Bar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "checkbox",
+      "id": "text_uppercase",
+      "label": "Uppercase text",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "vertical_padding",
+      "label": "Vertical padding",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Scroll settings"
+    },
+    {
+      "type": "range",
+      "id": "scroll_duration",
+      "label": "Scroll duration",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "s",
+      "default": 30
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Separator"
+    },
+    {
+      "type": "text",
+      "id": "separator",
+      "label": "Separator symbol",
+      "default": "◆"
+    },
+    {
+      "type": "range",
+      "id": "item_spacing",
+      "label": "Item spacing",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Announcement items"
+    },
+    {
+      "type": "text",
+      "id": "text_1",
+      "label": "Text 1",
+      "default": "24H EARLY"
+    },
+    {
+      "type": "text",
+      "id": "text_2",
+      "label": "Text 2",
+      "default": "SHOT IN BOMBAY"
+    },
+    {
+      "type": "text",
+      "id": "text_3",
+      "label": "Text 3",
+      "default": "DROP 01 – LIVE NOW"
+    },
+    {
+      "type": "text",
+      "id": "text_4",
+      "label": "Text 4",
+      "default": "EARN YOUR FIT VOL. I"
+    },
+    {
+      "type": "text",
+      "id": "text_5",
+      "label": "Text 5",
+      "default": "MEMBER PRE-ACCESS"
+    },
+    {
+      "type": "text",
+      "id": "text_6",
+      "label": "Text 6"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement Bar"
+    }
+  ]
+}
+{% endschema %}
