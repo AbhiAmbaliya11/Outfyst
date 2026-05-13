@@ -839,17 +839,21 @@ body {
 
 
     <!------------ MOBILE header------------------------------------- -->
-      <button
-        class="outfyst-hamburger"
-        aria-label="Open menu"
-        aria-expanded="false"
-        aria-controls="outfyst-mobile-menu"
-        id="outfyst-hamburger-btn"
-        type="button"
-      >
-        <span class="outfyst-hamburger__icon" aria-hidden="true"></span>
-        <span class="outfyst-hamburger__label">{{ section.settings.logo_text | default: shop.name }}</span>
-      </button>
+      <div class="outfyst-hamburger">
+        <button
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="outfyst-mobile-menu"
+          id="outfyst-hamburger-btn"
+          type="button"
+          style="background:none; border:none; padding:0; display:flex; align-items:center; cursor:pointer; height: 100%;"
+        >
+          <span class="outfyst-hamburger__icon" aria-hidden="true"></span>
+        </button>
+        <a href="{{ routes.root_url }}" class="outfyst-hamburger__label brand-name" style="text-decoration:none; color:inherit; display: flex; align-items: center; height: 100%;">
+          {{ section.settings.logo_text | default: shop.name }}
+        </a>
+      </div>
 
       <!-- MOBILE ONLY: Wishlist + Cart icon pills -->
       <div class="outfyst-mobile-icons">
