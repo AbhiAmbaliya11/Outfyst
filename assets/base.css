@@ -3620,13 +3620,14 @@ details-disclosure > details {
 }
 
 @media screen and (max-width: 425px) {
-  .template-index {
-    --font-heading-scale: 0.7 !important;
-  }
-  .template-index p, 
-  .template-index .text-body, 
-  .template-index .rich-text__text,
-  .template-index .caption {
+  h1, .h1 { font-size: 2.2rem !important; }
+  h2, .h2, .title { font-size: 1.8rem !important; }
+  h3, .h3 { font-size: 1.5rem !important; }
+  h4, .h4 { font-size: 1.3rem !important; }
+  h5, .h5 { font-size: 1.2rem !important; }
+  h6, .h6 { font-size: 1.1rem !important; }
+
+  p, .text-body, .rich-text__text, .caption {
     font-size: 1.2rem !important;
   }
 }
