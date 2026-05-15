@@ -3618,3 +3618,15 @@ details-disclosure > details {
 #shopify-section-template--21099631214755__main {
     background: #F5F2EC;
 }
+
+@media screen and (max-width: 425px) {
+  .template-index {
+    --font-heading-scale: 0.7 !important;
+  }
+  .template-index p, 
+  .template-index .text-body, 
+  .template-index .rich-text__text,
+  .template-index .caption {
+    font-size: 1.2rem !important;
+  }
+}
