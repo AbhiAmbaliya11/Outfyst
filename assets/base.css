@@ -3631,3 +3631,21 @@ details-disclosure > details {
     font-size: 1.2rem !important;
   }
 }
+
+/* Fix for Wishlist Icon Responsiveness on Product Cards */
+.fc-card [class*="wishlist" i],
+.fc-card [class*="flits" i],
+.fc-card [id*="wishlist" i] {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media screen and (max-width: 425px) {
+  .fc-card [class*="wishlist" i],
+  .fc-card [class*="flits" i],
+  .fc-card [id*="wishlist" i] {
+    transform: scale(0.75) !important;
+    transform-origin: top right !important;
+    margin: 0 !important;
+  }
+}
