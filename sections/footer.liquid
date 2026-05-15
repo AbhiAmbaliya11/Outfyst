@@ -93,6 +93,10 @@
     font-size: 9px;
   }
 
+  .custom-dark-footer__icon {
+    display: none;
+  }
+
   @media(max-width: 989px) {
     .custom-dark-footer {
       padding-left: 24px;
@@ -119,12 +123,45 @@
 
   @media(max-width: 575px) {
     .custom-dark-footer__inner {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
+      gap: 20px;
     }
 
     .custom-dark-footer__logo {
       font-size: 56px;
       letter-spacing: -3px;
+    }
+
+    .custom-dark-footer__heading.accordion-toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      margin: 0;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .custom-dark-footer__icon--plus {
+      display: block;
+    }
+
+    .custom-dark-footer__menu.is-open .custom-dark-footer__icon--plus {
+      display: none;
+    }
+
+    .custom-dark-footer__menu.is-open .custom-dark-footer__icon--minus {
+      display: block;
+    }
+
+    .custom-dark-footer__heading.accordion-toggle ~ ul {
+      display: none;
+      padding-top: 15px;
+      padding-bottom: 15px;
+    }
+
+    .custom-dark-footer__menu.is-open .custom-dark-footer__heading.accordion-toggle ~ ul {
+      display: block;
     }
   }
 </style>
@@ -142,7 +179,15 @@
       {% if block.type == 'link_list' %}
         <div class="custom-dark-footer__menu" {{ block.shopify_attributes }}>
           {% if block.settings.heading != blank %}
-            <h3 class="custom-dark-footer__heading">{{ block.settings.heading }}</h3>
+            <h3 class="custom-dark-footer__heading accordion-toggle">
+              {{ block.settings.heading }}
+              <span class="custom-dark-footer__icon custom-dark-footer__icon--plus">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1V11M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="custom-dark-footer__icon custom-dark-footer__icon--minus">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            </h3>
           {% endif %}
 
           {% if block.settings.menu != blank %}
@@ -330,3 +375,17 @@
   ]
 }
 {% endschema %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const accordions = document.querySelectorAll('.custom-dark-footer__heading.accordion-toggle');
+    accordions.forEach(acc => {
+      acc.addEventListener('click', function() {
+        if (window.innerWidth <= 575) {
+          const menu = this.closest('.custom-dark-footer__menu');
+          menu.classList.toggle('is-open');
+        }
+      });
+    });
+  });
+</script>
